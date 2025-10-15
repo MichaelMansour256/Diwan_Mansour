@@ -70,24 +70,22 @@ function formatCurrencyEGP(amount) {
 
 function Header({ onToggleCart }) {
   return (
-    <header className="sticky top-0 z-30 w-full border-b border-emerald-900/20 bg-emerald-950 text-emerald-50">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 w-full border-b border-amber-900/20 bg-amber-800 text-amber-50">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-emerald-800/60 ring-1 ring-emerald-600/40">
-            <span className="text-lg">📚</span>
-          </div>
+          <img src="./logo.png" alt="Diwan Mansour logo" className="h-10 w-10 rounded-md ring-1 ring-amber-600/40 object-contain bg-white" />
           <div>
             <h1 className="text-lg font-semibold tracking-tight sm:text-xl">
               Diwan Mansour for Books
             </h1>
-            <p className="text-xs text-emerald-200/80 sm:text-sm">Private catalog • Curated selection</p>
+            <p className="text-xs text-amber-100/90 sm:text-sm">Private catalog • Curated selection</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onToggleCart}
-            className="inline-flex items-center gap-2 rounded-md bg-emerald-700 px-3 py-2 text-sm font-medium text-emerald-50 shadow hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-400 lg:hidden"
+            className="inline-flex items-center gap-2 rounded-md bg-amber-700 px-3 py-2 text-sm font-medium text-amber-50 shadow hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 lg:hidden"
             aria-label="Toggle cart"
           >
             <span>Cart</span>
@@ -101,8 +99,8 @@ function Header({ onToggleCart }) {
 
 function BookCard({ book, onAddToCart }) {
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xl border border-emerald-900/10 bg-white shadow-sm transition hover:shadow-md">
-      <div className="relative aspect-[2/3] w-full overflow-hidden bg-emerald-50">
+    <div className="group flex flex-col overflow-hidden rounded-xl border border-amber-900/10 bg-white shadow-sm transition hover:shadow-md">
+      <div className="relative aspect-[2/3] w-full overflow-hidden bg-stone-50">
         <img
           src={book.imageUrl}
           alt={`${book.title} cover`}
@@ -116,13 +114,13 @@ function BookCard({ book, onAddToCart }) {
           <p className="mt-1 text-sm text-slate-600">{book.author}</p>
         </div>
         <div className="mt-auto flex items-center justify-between">
-          <span className="text-sm font-semibold text-emerald-800">
+          <span className="text-sm font-semibold text-green-800">
             {formatCurrencyEGP(book.price)}
           </span>
           <button
             type="button"
             onClick={() => onAddToCart(book)}
-            className="rounded-md bg-emerald-700 px-3 py-2 text-xs font-medium text-white shadow hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            className="rounded-md bg-amber-700 px-3 py-2 text-xs font-medium text-white shadow hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400"
           >
             Add to Cart
           </button>
@@ -151,10 +149,10 @@ function WhatsAppCheckoutButton({ cartItems, totalPrice }) {
       type="button"
       onClick={handleCheckout}
       disabled={isDisabled}
-      className={`mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold shadow transition focus:outline-none focus:ring-2 focus:ring-emerald-400 ${
+      className={`mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold shadow transition focus:outline-none focus:ring-2 focus:ring-amber-400 ${
         isDisabled
-          ? 'cursor-not-allowed bg-emerald-200 text-emerald-900/60'
-          : 'bg-emerald-700 text-white hover:bg-emerald-600'
+          ? 'cursor-not-allowed bg-amber-200 text-amber-900/60'
+          : 'bg-amber-700 text-white hover:bg-amber-600'
       }`}
     >
       <span>Checkout via WhatsApp</span>
@@ -178,7 +176,7 @@ function CartList({ cartItems, onRemoveItem, totalPrice }) {
                 <p className="text-xs text-slate-600">Qty: {item.quantity}</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-emerald-800">
+                <span className="text-sm font-semibold text-green-800">
                   {formatCurrencyEGP(item.price * item.quantity)}
                 </span>
                 <button
@@ -196,7 +194,7 @@ function CartList({ cartItems, onRemoveItem, totalPrice }) {
       <div className="mt-4 border-t border-slate-200 pt-4">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-slate-700">Total</span>
-          <span className="text-base font-semibold text-emerald-800">{formatCurrencyEGP(totalPrice)}</span>
+          <span className="text-base font-semibold text-green-800">{formatCurrencyEGP(totalPrice)}</span>
         </div>
       </div>
     </div>
@@ -206,7 +204,7 @@ function CartList({ cartItems, onRemoveItem, totalPrice }) {
 function CartSidebarDesktop({ cartItems, onRemoveItem, totalPrice }) {
   return (
     <aside className="hidden lg:sticky lg:top-[88px] lg:block lg:h-[calc(100vh-96px)] lg:w-80">
-      <div className="flex h-full flex-col rounded-xl border border-emerald-900/10 bg-white p-4 shadow-sm">
+      <div className="flex h-full flex-col rounded-xl border border-amber-900/10 bg-white p-4 shadow-sm">
         <CartList cartItems={cartItems} onRemoveItem={onRemoveItem} totalPrice={totalPrice} />
         <WhatsAppCheckoutButton cartItems={cartItems} totalPrice={totalPrice} />
       </div>
@@ -332,7 +330,7 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 via-emerald-50 to-emerald-100">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-amber-50 to-orange-50">
       <Header onToggleCart={() => setIsCartOpenOnMobile((v) => !v)} />
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -413,7 +411,7 @@ export default function App() {
         totalPrice={totalPrice}
       />
 
-      <footer className="border-t border-emerald-900/10 bg-white/60 backdrop-blur">
+      <footer className="border-t border-amber-900/10 bg-white/60 backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 py-6 text-center text-xs text-slate-600 sm:px-6 lg:px-8">
           © {new Date().getFullYear()} Diwan Mansour for Books. All rights reserved.
         </div>
@@ -565,7 +563,7 @@ function AdminAuthModal({ isOpen, onClose, onSuccess }) {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-sm rounded-xl border border-emerald-900/10 bg-white p-5 shadow-xl">
+      <div className="w-full max-w-sm rounded-xl border border-amber-900/10 bg-white p-5 shadow-xl">
         <h3 className="mb-3 text-base font-semibold text-slate-900">Admin Login</h3>
         <form onSubmit={submit} className="space-y-3">
           <input
@@ -573,14 +571,14 @@ function AdminAuthModal({ isOpen, onClose, onSuccess }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Admin email"
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
           />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
           />
           {error ? (
             <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>
@@ -597,7 +595,7 @@ function AdminAuthModal({ isOpen, onClose, onSuccess }) {
             <button
               type="submit"
               disabled={loading}
-              className="rounded-md bg-emerald-700 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-600 disabled:opacity-60"
+              className="rounded-md bg-amber-700 px-3 py-2 text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-60"
             >
               {loading ? 'Logging in...' : 'Login'}
             </button>
