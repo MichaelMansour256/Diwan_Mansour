@@ -8,6 +8,8 @@ const MOCK_BOOKS = [
     author: 'Alex Michaelides',
     price: 320,
     imageUrl: 'https://placehold.co/400x600/14532D/FFFFFF?text=Book+Cover',
+    condition: 'new',
+    statusImageUrl: '',
   },
   {
     id: 'b2',
@@ -15,6 +17,8 @@ const MOCK_BOOKS = [
     author: 'James Clear',
     price: 450,
     imageUrl: 'https://placehold.co/400x600/1E3A5F/FFFFFF?text=Book+Cover',
+    condition: 'used',
+    statusImageUrl: '',
   },
   {
     id: 'b3',
@@ -22,6 +26,8 @@ const MOCK_BOOKS = [
     author: 'Matt Haig',
     price: 380,
     imageUrl: 'https://placehold.co/400x600/0B3D2E/FFFFFF?text=Book+Cover',
+    condition: 'new',
+    statusImageUrl: '',
   },
   {
     id: 'b4',
@@ -29,6 +35,8 @@ const MOCK_BOOKS = [
     author: 'Yuval Noah Harari',
     price: 550,
     imageUrl: 'https://placehold.co/400x600/253B3D/FFFFFF?text=Book+Cover',
+    condition: 'used',
+    statusImageUrl: '',
   },
   {
     id: 'b5',
@@ -36,6 +44,8 @@ const MOCK_BOOKS = [
     author: 'Tara Westover',
     price: 400,
     imageUrl: 'https://placehold.co/400x600/4A3B2A/FFFFFF?text=Book+Cover',
+    condition: 'new',
+    statusImageUrl: '',
   },
   {
     id: 'b6',
@@ -43,6 +53,8 @@ const MOCK_BOOKS = [
     author: 'Delia Owens',
     price: 360,
     imageUrl: 'https://placehold.co/400x600/1B4332/FFFFFF?text=Book+Cover',
+    condition: 'used',
+    statusImageUrl: '',
   },
   {
     id: 'b7',
@@ -50,6 +62,8 @@ const MOCK_BOOKS = [
     author: 'Paulo Coelho',
     price: 300,
     imageUrl: 'https://placehold.co/400x600/2C3E50/FFFFFF?text=Book+Cover',
+    condition: 'new',
+    statusImageUrl: '',
   },
   {
     id: 'b8',
@@ -57,6 +71,8 @@ const MOCK_BOOKS = [
     author: 'Mark Manson',
     price: 420,
     imageUrl: 'https://placehold.co/400x600/264653/FFFFFF?text=Book+Cover',
+    condition: 'used',
+    statusImageUrl: '',
   },
 ];
 
@@ -78,7 +94,7 @@ function Header({ onToggleCart }) {
             <h1 className="text-lg font-semibold tracking-tight sm:text-xl">
               Diwan Mansour for Books
             </h1>
-            <p className="text-xs text-amber-100/90 sm:text-sm">Private catalog • Curated selection</p>
+            <p className="text-xs text-amber-100/90 sm:text-sm">مكتبة إلكترونية لعرض وبيع الكتب</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -107,6 +123,26 @@ function BookCard({ book, onAddToCart }) {
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           loading="lazy"
         />
+        {/* Condition tag */}
+        <div className="absolute top-2 left-2">
+          <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+            book.condition === 'new' 
+              ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20' 
+              : 'bg-orange-100 text-orange-800 ring-1 ring-orange-600/20'
+          }`}>
+            {book.condition === 'new' ? 'جديد' : 'مستعمل'}
+          </span>
+        </div>
+        {/* Status image overlay */}
+        {book.statusImageUrl && (
+          <div className="absolute top-2 right-2">
+            <img
+              src={book.statusImageUrl}
+              alt="Book status"
+              className="h-8 w-8 rounded-full border-2 border-white shadow-sm object-cover"
+            />
+          </div>
+        )}
       </div>
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-3">
@@ -137,7 +173,7 @@ function WhatsAppCheckoutButton({ cartItems, totalPrice }) {
     if (isDisabled) return;
     const header = 'اريد طلب الكتب التالية:';
     const lines = cartItems.map((item) => `- ${item.title} (x${item.quantity})`);
-    const totalLine = `المجموع: ${totalPrice}. يرجى التأكد من التوفر والدفع.`;
+    const totalLine = `المجموع: ${totalPrice}يرجي تأكيد التوفر وإرسال طريقة الدفع`;
     const message = [header, ...lines, totalLine].join('\n');
     const encoded = encodeURIComponent(message);
     const url = `https://wa.me/201201129135?text=${encoded}`;
@@ -274,7 +310,15 @@ export default function App() {
           const remote = [];
           snap.forEach((doc) => {
             const d = doc.data() || {};
-            if (d.id && d.title) remote.push({ id: d.id, title: d.title, author: d.author || '', price: d.price || 0, imageUrl: d.imageUrl || '' });
+            if (d.id && d.title) remote.push({ 
+              id: d.id, 
+              title: d.title, 
+              author: d.author || '', 
+              price: d.price || 0, 
+              imageUrl: d.imageUrl || '',
+              condition: d.condition || 'new',
+              statusImageUrl: d.statusImageUrl || ''
+            });
           });
           setBooks(remote);
           setIsBooksReady(true);
@@ -427,11 +471,22 @@ export default function App() {
 }
 
 function AdminPanel({ books, setBooks }) {
-  const [form, setForm] = useState({ title: '', author: '', price: '', imageUrl: '' });
+  const [form, setForm] = useState({ title: '', author: '', price: '', imageUrl: '', condition: 'new', statusImageUrl: '' });
+  const [statusImageFile, setStatusImageFile] = useState(null);
 
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
+  }
+
+  function handleStatusImageChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setStatusImageFile(file);
+      // Create a preview URL for immediate display
+      const previewUrl = URL.createObjectURL(file);
+      setForm((f) => ({ ...f, statusImageUrl: previewUrl }));
+    }
   }
 
   async function handleAdd(e) {
@@ -440,9 +495,20 @@ function AdminPanel({ books, setBooks }) {
     const author = form.author.trim();
     const priceNum = Number(form.price);
     const imageUrl = form.imageUrl.trim() || 'https://placehold.co/400x600/38761D/FFFFFF?text=Book+Cover';
+    const condition = form.condition || 'new';
+    let statusImageUrl = form.statusImageUrl.trim();
+    
     if (!title || !author || !Number.isFinite(priceNum) || priceNum <= 0) return;
+    
+    // If a file was selected, upload it (for now, we'll use the preview URL)
+    // In production, you'd upload to Firebase Storage or another service
+    if (statusImageFile) {
+      // TODO: Upload to Firebase Storage and get the download URL
+      // For now, we'll use the preview URL
+    }
+    
     const id = `b_${Date.now()}`;
-    const newBook = { id, title, author, price: Math.round(priceNum), imageUrl };
+    const newBook = { id, title, author, price: Math.round(priceNum), imageUrl, condition, statusImageUrl };
     try {
       if (window.firebaseDb) {
         await window.firebaseDb.collection('books').doc(id).set({
@@ -456,7 +522,8 @@ function AdminPanel({ books, setBooks }) {
     } catch (err) {
       console.error('Add book failed', err);
     }
-    setForm({ title: '', author: '', price: '', imageUrl: '' });
+    setForm({ title: '', author: '', price: '', imageUrl: '', condition: 'new', statusImageUrl: '' });
+    setStatusImageFile(null);
   }
 
   async function handleRemove(id) {
@@ -471,22 +538,22 @@ function AdminPanel({ books, setBooks }) {
   }
 
   return (
-    <section className="mb-6 rounded-xl border border-emerald-900/10 bg-white p-4 shadow-sm">
+    <section className="mb-6 rounded-xl border border-amber-900/10 bg-white p-4 shadow-sm">
       <h3 className="mb-3 text-base font-semibold text-slate-900">Admin Panel</h3>
-      <form onSubmit={handleAdd} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <form onSubmit={handleAdd} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
         <input
           name="title"
           value={form.title}
           onChange={handleChange}
           placeholder="Title"
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
         />
         <input
           name="author"
           value={form.author}
           onChange={handleChange}
           placeholder="Author"
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
         />
         <input
           name="price"
@@ -495,21 +562,38 @@ function AdminPanel({ books, setBooks }) {
           placeholder="Price (EGP)"
           type="number"
           min="1"
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
         />
+        <select
+          name="condition"
+          value={form.condition}
+          onChange={handleChange}
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+        >
+          <option value="new">جديد (New)</option>
+          <option value="used">مستعمل (Used)</option>
+        </select>
         <input
           name="imageUrl"
           value={form.imageUrl}
           onChange={handleChange}
-          placeholder="Image URL (optional)"
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          placeholder="Cover Image URL (optional)"
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
         />
-        <button
-          type="submit"
-          className="rounded-md bg-emerald-700 px-3 py-2 text-sm font-medium text-white shadow hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-        >
-          Add Book
-        </button>
+        <div className="flex flex-col gap-2">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleStatusImageChange}
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400"
+          />
+          <button
+            type="submit"
+            className="rounded-md bg-amber-700 px-3 py-2 text-sm font-medium text-white shadow hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400"
+          >
+            Add Book
+          </button>
+        </div>
       </form>
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
