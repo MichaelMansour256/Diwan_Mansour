@@ -155,8 +155,9 @@ function WhatsAppCheckoutButton({ cartItems, totalPrice }) {
     if (isDisabled) return;
     const header = 'اريد طلب الكتب التالية:';
     const lines = cartItems.map((item) => `- ${item.title} (x${item.quantity})`);
-    const totalLine = `المجموع: ${totalPrice}/n يرجي تأكيد التوفر وإرسال طريقة الدفع`;
-    const message = [header, ...lines, totalLine].join('\n');
+    const totalsum = `المجموع: ${totalPrice}`;
+    const totalLine = `يرجي تأكيد التوفر وإرسال طريقة الدفع`;
+    const message = [header, ...lines, totalsum, totalLine].join('\n');
     const encoded = encodeURIComponent(message);
     const url = `https://wa.me/201201129135?text=${encoded}`;
     window.open(url, '_blank');
@@ -454,6 +455,7 @@ export default function App() {
 function AdminPanel({ books, setBooks }) {
   const [form, setForm] = useState({ title: '', author: '', price: '', condition: 'new' });
   const [coverImageFile, setCoverImageFile] = useState(null);
+  const [editingBook, setEditingBook] = useState(null);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -467,6 +469,23 @@ function AdminPanel({ books, setBooks }) {
     }
   }
 
+  function startEdit(book) {
+    setEditingBook(book);
+    setForm({
+      title: book.title,
+      author: book.author,
+      price: book.price.toString(),
+      condition: book.condition
+    });
+    setCoverImageFile(null);
+  }
+
+  function cancelEdit() {
+    setEditingBook(null);
+    setForm({ title: '', author: '', price: '', condition: 'new' });
+    setCoverImageFile(null);
+  }
+
   async function handleAdd(e) {
     e.preventDefault();
     const title = form.title.trim();
@@ -475,55 +494,62 @@ function AdminPanel({ books, setBooks }) {
     const condition = form.condition || 'new';
     
     if (!title || !author || !Number.isFinite(priceNum) || priceNum <= 0) return;
-    if (!coverImageFile) {
+    if (!coverImageFile && !editingBook) {
       alert('Please select a cover image');
       return;
     }
     
-    let imageUrl = '';
+    let imageUrl = editingBook ? editingBook.imageUrl : '';
     
-    // Upload to ImgBB
-    try {
-      const formData = new FormData();
-      formData.append('image', coverImageFile);
-      formData.append('key', 'd42965b5ea3b2df2dc7e2002c177b1f1'); // Replace with your ImgBB API key
-      
-      const response = await fetch('https://api.imgbb.com/1/upload', {
-        method: 'POST',
-        body: formData
-      });
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        imageUrl = result.data.url;
-      } else {
-        throw new Error(result.error?.message || 'Upload failed');
+    // Upload new image to ImgBB if a file was selected
+    if (coverImageFile) {
+      try {
+        const formData = new FormData();
+        formData.append('image', coverImageFile);
+        formData.append('key', 'd42965b5ea3b2df2dc7e2002c177b1f1');
+        
+        const response = await fetch('https://api.imgbb.com/1/upload', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          imageUrl = result.data.url;
+        } else {
+          throw new Error(result.error?.message || 'Upload failed');
+        }
+      } catch (err) {
+        console.error('ImgBB upload failed', err);
+        alert('Failed to upload image. Please try again.');
+        return;
       }
-    } catch (err) {
-      console.error('ImgBB upload failed', err);
-      alert('Failed to upload image. Please try again.');
-      return;
     }
     
-    const id = `b_${Date.now()}`;
+    const id = editingBook ? editingBook.id : `b_${Date.now()}`;
     const newBook = { id, title, author, price: Math.round(priceNum), imageUrl, condition };
     
     try {
       if (window.firebaseDb) {
         await window.firebaseDb.collection('books').doc(id).set({
           ...newBook,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAt: editingBook ? editingBook.createdAt : firebase.firestore.FieldValue.serverTimestamp(),
         });
       } else {
-        setBooks((prev) => [newBook, ...prev]);
+        if (editingBook) {
+          setBooks((prev) => prev.map(b => b.id === id ? newBook : b));
+        } else {
+          setBooks((prev) => [newBook, ...prev]);
+        }
       }
     } catch (err) {
-      console.error('Add book failed', err);
+      console.error('Add/Update book failed', err);
     }
     
     setForm({ title: '', author: '', price: '', condition: 'new' });
     setCoverImageFile(null);
+    setEditingBook(null);
   }
 
   async function handleRemove(id) {
@@ -539,7 +565,9 @@ function AdminPanel({ books, setBooks }) {
 
   return (
     <section className="mb-6 rounded-xl border border-amber-900/10 bg-white p-4 shadow-sm">
-      <h3 className="mb-3 text-base font-semibold text-slate-900">Admin Panel</h3>
+      <h3 className="mb-3 text-base font-semibold text-slate-900">
+        {editingBook ? `Edit Book: ${editingBook.title}` : 'Admin Panel'}
+      </h3>
       <form onSubmit={handleAdd} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <input
           name="title"
@@ -580,29 +608,52 @@ function AdminPanel({ books, setBooks }) {
             onChange={handleCoverImageChange}
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400"
           />
-          <button
-            type="submit"
-            className="rounded-md bg-amber-700 px-3 py-2 text-sm font-medium text-white shadow hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400"
-          >
-            Add Book
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              className="flex-1 rounded-md bg-amber-700 px-3 py-2 text-sm font-medium text-white shadow hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            >
+              {editingBook ? 'Update Book' : 'Add Book'}
+            </button>
+            {editingBook && (
+              <button
+                type="button"
+                onClick={cancelEdit}
+                className="rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </div>
       </form>
 
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {books.map((b) => (
-          <div key={b.id} className="flex items-center justify-between rounded-lg border border-slate-200 p-3">
+          <div key={b.id} className={`flex items-center justify-between rounded-lg border p-3 ${
+            editingBook && editingBook.id === b.id ? 'border-amber-500 bg-amber-50' : 'border-slate-200'
+          }`}>
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-slate-900">{b.title}</p>
               <p className="truncate text-xs text-slate-600">{b.author}</p>
+              <p className="text-xs text-slate-500">{formatCurrencyEGP(b.price)} • {b.condition === 'new' ? 'جديد' : 'مستعمل'}</p>
             </div>
-            <button
-              type="button"
-              onClick={() => handleRemove(b.id)}
-              className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200"
-            >
-              Remove
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => startEdit(b)}
+                className="rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-200"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRemove(b.id)}
+                className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200"
+              >
+                Remove
+              </button>
+            </div>
           </div>
         ))}
       </div>
