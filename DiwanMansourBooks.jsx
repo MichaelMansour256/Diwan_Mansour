@@ -480,24 +480,39 @@ function AdminPanel({ books, setBooks }) {
       return;
     }
     
-    // Create preview URL for immediate display
-    const imageUrl = URL.createObjectURL(coverImageFile);
+    let imageUrl = '';
     
-    const id = `b_${Date.now()}`;
-    const newBook = { id, title, author, price: Math.round(priceNum), imageUrl, condition };
-    try {
-      if (window.firebaseDb) {
-        await window.firebaseDb.collection('books').doc(id).set({
-          ...newBook,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        });
-      } else {
-        // fallback local update if firebase not configured
-        setBooks((prev) => [newBook, ...prev]);
+    // Upload to Firebase Storage if available
+    if (window.firebaseStorage) {
+      try {
+        const id = `b_${Date.now()}`;
+        const storageRef = window.firebaseStorage.ref().child(`book-covers/${id}`);
+        const uploadTask = await storageRef.put(coverImageFile);
+        imageUrl = await uploadTask.ref.getDownloadURL();
+        
+        const newBook = { id, title, author, price: Math.round(priceNum), imageUrl, condition };
+        
+        if (window.firebaseDb) {
+          await window.firebaseDb.collection('books').doc(id).set({
+            ...newBook,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          });
+        } else {
+          setBooks((prev) => [newBook, ...prev]);
+        }
+      } catch (err) {
+        console.error('Upload failed', err);
+        alert('Failed to upload image. Please try again.');
+        return;
       }
-    } catch (err) {
-      console.error('Add book failed', err);
+    } else {
+      // Fallback to local preview URL (only works on admin's device)
+      imageUrl = URL.createObjectURL(coverImageFile);
+      const id = `b_${Date.now()}`;
+      const newBook = { id, title, author, price: Math.round(priceNum), imageUrl, condition };
+      setBooks((prev) => [newBook, ...prev]);
     }
+    
     setForm({ title: '', author: '', price: '', condition: 'new' });
     setCoverImageFile(null);
   }

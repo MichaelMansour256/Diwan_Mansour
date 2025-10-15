@@ -47,6 +47,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     <script>
       // TODO: replace with your Firebase config from the Firebase Console
       // Project settings -> Your apps -> SDK setup and configuration
@@ -65,6 +66,7 @@
             window.firebaseApp = firebase.initializeApp(window.DM_FIREBASE_CONFIG);
             window.firebaseAuth = firebase.auth();
             window.firebaseDb = firebase.firestore();
+            window.firebaseStorage = firebase.storage();
             window.firebaseAuth.setPersistence('local').catch(()=>{});
           }
         } catch (e) { console.error('Firebase init error', e); }
