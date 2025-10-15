@@ -527,17 +527,29 @@ function AdminPanel({ books, setBooks }) {
 }
 
 function AdminAuthModal({ isOpen, onClose, onSuccess }) {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const ADMIN_PASSWORD = 'diwan-admin-2025';
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
+    setError('');
+    try {
+      setLoading(true);
+      if (!window.firebaseAuth) {
+        throw new Error('Firebase not initialized. Check index.html config.');
+      }
+      await window.firebaseAuth.signInWithEmailAndPassword(email.trim(), password);
       try { localStorage.setItem('dm_admin_authed', 'true'); } catch (_) {}
-      // Optionally sign in Firebase anonymous or email/password here
       onSuccess();
+      setEmail('');
       setPassword('');
       onClose();
+    } catch (err) {
+      setError(err && err.message ? err.message : 'Login failed');
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -548,29 +560,41 @@ function AdminAuthModal({ isOpen, onClose, onSuccess }) {
         <h3 className="mb-3 text-base font-semibold text-slate-900">Admin Login</h3>
         <form onSubmit={submit} className="space-y-3">
           <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Admin email"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          />
+          <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter admin password"
+            placeholder="Password"
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
           />
+          {error ? (
+            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>
+          ) : null}
           <div className="flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
               className="rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+              disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="rounded-md bg-emerald-700 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-600"
+              disabled={loading}
+              className="rounded-md bg-emerald-700 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-600 disabled:opacity-60"
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </div>
         </form>
-        <p className="mt-3 text-xs text-slate-500">For demo use only. Change the password constant in the source before deploying.</p>
+        <p className="mt-3 text-xs text-slate-500">Use a Firebase Auth email/password user. Configure in Firebase Console.</p>
       </div>
     </div>
   );
