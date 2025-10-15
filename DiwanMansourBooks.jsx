@@ -543,10 +543,11 @@ function AdminPanel({ books, setBooks }) {
     try {
       if (window.firebaseDb) {
         console.log('Updating book in Firebase:', id, newBook);
-        await window.firebaseDb.collection('books').doc(id).set({
+        const bookData = {
           ...newBook,
-          createdAt: editingBook ? editingBook.createdAt : firebase.firestore.FieldValue.serverTimestamp(),
-        });
+          createdAt: editingBook?.createdAt || firebase.firestore.FieldValue.serverTimestamp()
+        };
+        await window.firebaseDb.collection('books').doc(id).set(bookData);
         console.log('Book updated successfully in Firebase');
       } else {
         console.log('Firebase not available, updating locally');
