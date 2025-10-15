@@ -482,35 +482,44 @@ function AdminPanel({ books, setBooks }) {
     
     let imageUrl = '';
     
-    // Upload to Firebase Storage if available
-    if (window.firebaseStorage) {
-      try {
-        const id = `b_${Date.now()}`;
-        const storageRef = window.firebaseStorage.ref().child(`book-covers/${id}`);
-        const uploadTask = await storageRef.put(coverImageFile);
-        imageUrl = await uploadTask.ref.getDownloadURL();
-        
-        const newBook = { id, title, author, price: Math.round(priceNum), imageUrl, condition };
-        
-        if (window.firebaseDb) {
-          await window.firebaseDb.collection('books').doc(id).set({
-            ...newBook,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          });
-        } else {
-          setBooks((prev) => [newBook, ...prev]);
-        }
-      } catch (err) {
-        console.error('Upload failed', err);
-        alert('Failed to upload image. Please try again.');
-        return;
+    // Upload to ImgBB
+    try {
+      const formData = new FormData();
+      formData.append('image', coverImageFile);
+      formData.append('key', 'd42965b5ea3b2df2dc7e2002c177b1f1'); // Replace with your ImgBB API key
+      
+      const response = await fetch('https://api.imgbb.com/1/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        imageUrl = result.data.url;
+      } else {
+        throw new Error(result.error?.message || 'Upload failed');
       }
-    } else {
-      // Fallback to local preview URL (only works on admin's device)
-      imageUrl = URL.createObjectURL(coverImageFile);
-      const id = `b_${Date.now()}`;
-      const newBook = { id, title, author, price: Math.round(priceNum), imageUrl, condition };
-      setBooks((prev) => [newBook, ...prev]);
+    } catch (err) {
+      console.error('ImgBB upload failed', err);
+      alert('Failed to upload image. Please try again.');
+      return;
+    }
+    
+    const id = `b_${Date.now()}`;
+    const newBook = { id, title, author, price: Math.round(priceNum), imageUrl, condition };
+    
+    try {
+      if (window.firebaseDb) {
+        await window.firebaseDb.collection('books').doc(id).set({
+          ...newBook,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      } else {
+        setBooks((prev) => [newBook, ...prev]);
+      }
+    } catch (err) {
+      console.error('Add book failed', err);
     }
     
     setForm({ title: '', author: '', price: '', condition: 'new' });
