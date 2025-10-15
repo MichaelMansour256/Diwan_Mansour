@@ -254,6 +254,8 @@ function CartModalMobile({ isOpen, onClose, cartItems, onRemoveItem, totalPrice 
 export default function App() {
   const [isCartOpenOnMobile, setIsCartOpenOnMobile] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isAdminAuthed, setIsAdminAuthed] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [books, setBooks] = useState(MOCK_BOOKS);
   const [cartItems, setCartItems] = useState([]);
 
@@ -261,6 +263,8 @@ export default function App() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem('dm_books');
+      const authed = localStorage.getItem('dm_admin_authed') === 'true';
+      setIsAdminAuthed(authed);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.every((b) => b && b.id && b.title)) {
@@ -279,6 +283,20 @@ export default function App() {
       // ignore
     }
   }, [books]);
+
+  function openAdmin() {
+    if (isAdminAuthed) {
+      setIsAdminOpen((v) => !v);
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  }
+
+  function handleAdminLogout() {
+    setIsAdminAuthed(false);
+    setIsAdminOpen(false);
+    try { localStorage.setItem('dm_admin_authed', 'false'); } catch (_) {}
+  }
 
   function addToCart(book) {
     setCartItems((prev) => {
@@ -313,15 +331,24 @@ export default function App() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setIsAdminOpen((v) => !v)}
+              onClick={openAdmin}
               className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-400"
             >
               {isAdminOpen ? 'Close Admin' : 'Open Admin'}
             </button>
+            {isAdminAuthed && (
+              <button
+                type="button"
+                onClick={handleAdminLogout}
+                className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
 
-        {isAdminOpen && (
+        {isAdminOpen && isAdminAuthed && (
           <AdminPanel books={books} setBooks={setBooks} />
         )}
 
@@ -378,6 +405,12 @@ export default function App() {
           © {new Date().getFullYear()} Diwan Mansour for Books. All rights reserved.
         </div>
       </footer>
+
+      <AdminAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => setIsAdminAuthed(true)}
+      />
     </div>
   );
 }
@@ -467,6 +500,55 @@ function AdminPanel({ books, setBooks }) {
         ))}
       </div>
     </section>
+  );
+}
+
+function AdminAuthModal({ isOpen, onClose, onSuccess }) {
+  const [password, setPassword] = useState('');
+  const ADMIN_PASSWORD = 'diwan-admin-2025';
+
+  function submit(e) {
+    e.preventDefault();
+    if (password === ADMIN_PASSWORD) {
+      try { localStorage.setItem('dm_admin_authed', 'true'); } catch (_) {}
+      onSuccess();
+      setPassword('');
+      onClose();
+    }
+  }
+
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-sm rounded-xl border border-emerald-900/10 bg-white p-5 shadow-xl">
+        <h3 className="mb-3 text-base font-semibold text-slate-900">Admin Login</h3>
+        <form onSubmit={submit} className="space-y-3">
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter admin password"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          />
+          <div className="flex items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="rounded-md bg-emerald-700 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-600"
+            >
+              Login
+            </button>
+          </div>
+        </form>
+        <p className="mt-3 text-xs text-slate-500">For demo use only. Change the password constant in the source before deploying.</p>
+      </div>
+    </div>
   );
 }
 
