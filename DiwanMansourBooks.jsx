@@ -155,7 +155,7 @@ function WhatsAppCheckoutButton({ cartItems, totalPrice }) {
     if (isDisabled) return;
     const header = 'اريد طلب الكتب التالية:';
     const lines = cartItems.map((item) => `- ${item.title} (x${item.quantity})`);
-    const totalLine = `المجموع: ${totalPrice}يرجي تأكيد التوفر وإرسال طريقة الدفع`;
+    const totalLine = `المجموع: ${totalPrice}/n يرجي تأكيد التوفر وإرسال طريقة الدفع`;
     const message = [header, ...lines, totalLine].join('\n');
     const encoded = encodeURIComponent(message);
     const url = `https://wa.me/201201129135?text=${encoded}`;
