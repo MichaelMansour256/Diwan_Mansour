@@ -1,0 +1,24 @@
+# dependencies / builds
+node_modules/
+dist/
+build/
+.cache/
+.parcel-cache/
+
+# env / logs / editor
+.env
+*.log
+.DS_Store
+*.local
+.vscode/
+.idea/
+
+# misc
+coverage/
+.tmp/
+.next/
+.svelte-kit/
+.storybook/
+yarn.lock
+pnpm-lock.yaml
+package-lock.json

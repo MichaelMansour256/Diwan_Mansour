@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diwan Mansour for Books</title>
+    <meta name="description" content="Private book catalog with cart and WhatsApp checkout" />
+    <link rel="icon" href="data:," />
+
+    <!-- Tailwind CDN (play) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: { extend: {} },
+      };
+    </script>
+    <style>
+      .notice { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+    </style>
+  </head>
+  <body class="min-h-screen">
+    <div id="root"></div>
+    <div id="notice" class="notice"></div>
+
+    <!-- React + ReactDOM via CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for in-browser JSX transform (dev only) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- App: load the JSX file content inline for demo use -->
+    <script type="text/babel" data-type="module" data-presets="env,react">
+      async function loadApp() {
+        const notice = document.getElementById('notice');
+        try {
+          if (location.protocol === 'file:') {
+            notice.innerHTML = '<div style="padding:12px; text-align:center; color:#064e3b; background:#ecfdf5; border:1px solid #a7f3d0;">For security reasons, some browsers block loading local files. Please run a local server:<br/><code>python -m http.server 5173</code> or <code>npx serve -s . --listen 5173</code> and open <code>http://localhost:5173/index.html</code>.</div>';
+          }
+
+          const res = await fetch('DiwanMansourBooks.jsx');
+          const code = await res.text();
+
+          // Strip the React import line and default export for in-browser eval
+          const stripped = code
+            .replace(/^import\s+[^\n]*react[^\n]*\n/i, '')
+            .replace(/export\s+default\s+/i, '');
+
+          const shim = 'const { useEffect, useMemo, useState } = React;\n';
+          const transformed = Babel.transform(shim + stripped, { presets: ['env', 'react'] }).code;
+
+          // eslint-disable-next-line no-eval
+          eval(transformed);
+
+          const root = ReactDOM.createRoot(document.getElementById('root'));
+          root.render(React.createElement(App));
+        } catch (err) {
+          console.error(err);
+          notice.innerHTML = '<div style="padding:12px; text-align:center; color:#991b1b; background:#fef2f2; border:1px solid #fecaca;">Failed to load demo. Please use a local server:<br/><code>python -m http.server 5173</code> or <code>npx serve -s . --listen 5173</code>.</div>';
+        }
+      }
+      loadApp();
+    </script>
+  </body>
+</html>
