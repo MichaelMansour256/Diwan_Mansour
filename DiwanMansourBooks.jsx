@@ -137,12 +137,12 @@ function WhatsAppCheckoutButton({ cartItems, totalPrice }) {
 
   function handleCheckout() {
     if (isDisabled) return;
-    const header = 'Hello, I would like to order the following books from Diwan Mansour:';
+    const header = 'اريد طلب الكتب التالية:';
     const lines = cartItems.map((item) => `- ${item.title} (x${item.quantity})`);
-    const totalLine = `Total EGP: ${totalPrice}. Please confirm availability and payment.`;
+    const totalLine = `المجموع: ${totalPrice}. يرجى التأكد من التوفر والدفع.`;
     const message = [header, ...lines, totalLine].join('\n');
     const encoded = encodeURIComponent(message);
-    const url = `https://wa.me/201001234567?text=${encoded}`;
+    const url = `https://wa.me/201201129135?text=${encoded}`;
     window.open(url, '_blank');
   }
 
