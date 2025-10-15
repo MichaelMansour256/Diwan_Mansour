@@ -259,30 +259,34 @@ export default function App() {
   const [books, setBooks] = useState(MOCK_BOOKS);
   const [cartItems, setCartItems] = useState([]);
 
-  // Persist books to localStorage
+  // Load admin auth from localStorage, and subscribe to Firestore books
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('dm_books');
       const authed = localStorage.getItem('dm_admin_authed') === 'true';
       setIsAdminAuthed(authed);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.every((b) => b && b.id && b.title)) {
-          setBooks(parsed);
-        }
-      }
-    } catch (_) {
-      // ignore
+    } catch (_) {}
+
+    // Firestore realtime subscription (requires Firebase config in index.html)
+    if (window.firebaseDb) {
+      const unsubscribe = window.firebaseDb
+        .collection('books')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot((snap) => {
+          const remote = [];
+          snap.forEach((doc) => {
+            const d = doc.data() || {};
+            if (d.id && d.title) remote.push({ id: d.id, title: d.title, author: d.author || '', price: d.price || 0, imageUrl: d.imageUrl || '' });
+          });
+          if (remote.length > 0) {
+            setBooks(remote);
+          }
+        }, (err) => {
+          // fallback to mock if needed
+          console.error('Firestore subscribe error', err);
+        });
+      return () => unsubscribe && unsubscribe();
     }
   }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('dm_books', JSON.stringify(books));
-    } catch (_) {
-      // ignore
-    }
-  }, [books]);
 
   function openAdmin() {
     if (isAdminAuthed) {
@@ -423,7 +427,7 @@ function AdminPanel({ books, setBooks }) {
     setForm((f) => ({ ...f, [name]: value }));
   }
 
-  function handleAdd(e) {
+  async function handleAdd(e) {
     e.preventDefault();
     const title = form.title.trim();
     const author = form.author.trim();
@@ -432,11 +436,30 @@ function AdminPanel({ books, setBooks }) {
     if (!title || !author || !Number.isFinite(priceNum) || priceNum <= 0) return;
     const id = `b_${Date.now()}`;
     const newBook = { id, title, author, price: Math.round(priceNum), imageUrl };
-    setBooks((prev) => [newBook, ...prev]);
+    try {
+      if (window.firebaseDb) {
+        await window.firebaseDb.collection('books').doc(id).set({
+          ...newBook,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      } else {
+        // fallback local update if firebase not configured
+        setBooks((prev) => [newBook, ...prev]);
+      }
+    } catch (err) {
+      console.error('Add book failed', err);
+    }
     setForm({ title: '', author: '', price: '', imageUrl: '' });
   }
 
-  function handleRemove(id) {
+  async function handleRemove(id) {
+    try {
+      if (window.firebaseDb) {
+        await window.firebaseDb.collection('books').doc(id).delete();
+      }
+    } catch (err) {
+      console.error('Remove book failed', err);
+    }
     setBooks((prev) => prev.filter((b) => b.id !== id));
   }
 
@@ -511,6 +534,7 @@ function AdminAuthModal({ isOpen, onClose, onSuccess }) {
     e.preventDefault();
     if (password === ADMIN_PASSWORD) {
       try { localStorage.setItem('dm_admin_authed', 'true'); } catch (_) {}
+      // Optionally sign in Firebase anonymous or email/password here
       onSuccess();
       setPassword('');
       onClose();

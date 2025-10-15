@@ -30,6 +30,34 @@
     <!-- Babel for in-browser JSX transform (dev only) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+    <!-- Firebase (compat builds for simplicity in this demo) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+      // TODO: replace with your Firebase config from the Firebase Console
+      // Project settings -> Your apps -> SDK setup and configuration
+      window.DM_FIREBASE_CONFIG = {
+        apiKey: "AIzaSyDc1o259JWPXOWyByKlD7uCu09K8ebB68U",
+        authDomain: "diwanmansour-f8d3a.firebaseapp.com",
+        projectId: "diwanmansour-f8d3a",
+        storageBucket: "diwanmansour-f8d3a.firebasestorage.app",
+        messagingSenderId: "178551104011",
+        appId: "1:178551104011:web:71894ea60e87231d209d0e"
+
+      };
+      (function initFirebase(){
+        try {
+          if (window.firebase && !window.firebaseApp && window.DM_FIREBASE_CONFIG && window.DM_FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
+            window.firebaseApp = firebase.initializeApp(window.DM_FIREBASE_CONFIG);
+            window.firebaseAuth = firebase.auth();
+            window.firebaseDb = firebase.firestore();
+            window.firebaseAuth.setPersistence('local').catch(()=>{});
+          }
+        } catch (e) { console.error('Firebase init error', e); }
+      })();
+    </script>
+
     <!-- App: load the JSX file content inline for demo use -->
     <script type="text/babel" data-type="module" data-presets="env,react">
       async function loadApp() {
