@@ -256,7 +256,8 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isAdminAuthed, setIsAdminAuthed] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [books, setBooks] = useState(MOCK_BOOKS);
+  const [books, setBooks] = useState([]);
+  const [isBooksReady, setIsBooksReady] = useState(false);
   const [cartItems, setCartItems] = useState([]);
 
   // Load admin auth from localStorage, and subscribe to Firestore books
@@ -277,15 +278,19 @@ export default function App() {
             const d = doc.data() || {};
             if (d.id && d.title) remote.push({ id: d.id, title: d.title, author: d.author || '', price: d.price || 0, imageUrl: d.imageUrl || '' });
           });
-          if (remote.length > 0) {
-            setBooks(remote);
-          }
+          setBooks(remote);
+          setIsBooksReady(true);
         }, (err) => {
           // fallback to mock if needed
           console.error('Firestore subscribe error', err);
+          setBooks([]);
+          setIsBooksReady(true);
         });
       return () => unsubscribe && unsubscribe();
     }
+    // If Firebase not configured, fall back to MOCK_BOOKS immediately
+    setBooks(MOCK_BOOKS);
+    setIsBooksReady(true);
   }, []);
 
   function openAdmin() {
@@ -377,11 +382,15 @@ export default function App() {
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
-              {books.map((book) => (
-                <BookCard key={book.id} book={book} onAddToCart={addToCart} />
-              ))}
-            </div>
+            {isBooksReady ? (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+                {books.map((book) => (
+                  <BookCard key={book.id} book={book} onAddToCart={addToCart} />
+                ))}
+              </div>
+            ) : (
+              <div className="py-10 text-center text-sm text-slate-500">Loading…</div>
+            )}
           </section>
 
           {/* Desktop sidebar */}
