@@ -9,7 +9,6 @@ const MOCK_BOOKS = [
     price: 320,
     imageUrl: 'https://placehold.co/400x600/14532D/FFFFFF?text=Book+Cover',
     condition: 'new',
-    statusImageUrl: '',
   },
   {
     id: 'b2',
@@ -18,7 +17,6 @@ const MOCK_BOOKS = [
     price: 450,
     imageUrl: 'https://placehold.co/400x600/1E3A5F/FFFFFF?text=Book+Cover',
     condition: 'used',
-    statusImageUrl: '',
   },
   {
     id: 'b3',
@@ -27,7 +25,6 @@ const MOCK_BOOKS = [
     price: 380,
     imageUrl: 'https://placehold.co/400x600/0B3D2E/FFFFFF?text=Book+Cover',
     condition: 'new',
-    statusImageUrl: '',
   },
   {
     id: 'b4',
@@ -36,7 +33,6 @@ const MOCK_BOOKS = [
     price: 550,
     imageUrl: 'https://placehold.co/400x600/253B3D/FFFFFF?text=Book+Cover',
     condition: 'used',
-    statusImageUrl: '',
   },
   {
     id: 'b5',
@@ -45,7 +41,6 @@ const MOCK_BOOKS = [
     price: 400,
     imageUrl: 'https://placehold.co/400x600/4A3B2A/FFFFFF?text=Book+Cover',
     condition: 'new',
-    statusImageUrl: '',
   },
   {
     id: 'b6',
@@ -54,7 +49,6 @@ const MOCK_BOOKS = [
     price: 360,
     imageUrl: 'https://placehold.co/400x600/1B4332/FFFFFF?text=Book+Cover',
     condition: 'used',
-    statusImageUrl: '',
   },
   {
     id: 'b7',
@@ -63,7 +57,6 @@ const MOCK_BOOKS = [
     price: 300,
     imageUrl: 'https://placehold.co/400x600/2C3E50/FFFFFF?text=Book+Cover',
     condition: 'new',
-    statusImageUrl: '',
   },
   {
     id: 'b8',
@@ -72,7 +65,6 @@ const MOCK_BOOKS = [
     price: 420,
     imageUrl: 'https://placehold.co/400x600/264653/FFFFFF?text=Book+Cover',
     condition: 'used',
-    statusImageUrl: '',
   },
 ];
 
@@ -133,16 +125,6 @@ function BookCard({ book, onAddToCart }) {
             {book.condition === 'new' ? 'جديد' : 'مستعمل'}
           </span>
         </div>
-        {/* Status image overlay */}
-        {book.statusImageUrl && (
-          <div className="absolute top-2 right-2">
-            <img
-              src={book.statusImageUrl}
-              alt="Book status"
-              className="h-8 w-8 rounded-full border-2 border-white shadow-sm object-cover"
-            />
-          </div>
-        )}
       </div>
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-3">
@@ -316,8 +298,7 @@ export default function App() {
               author: d.author || '', 
               price: d.price || 0, 
               imageUrl: d.imageUrl || '',
-              condition: d.condition || 'new',
-              statusImageUrl: d.statusImageUrl || ''
+              condition: d.condition || 'new'
             });
           });
           setBooks(remote);
@@ -471,21 +452,18 @@ export default function App() {
 }
 
 function AdminPanel({ books, setBooks }) {
-  const [form, setForm] = useState({ title: '', author: '', price: '', imageUrl: '', condition: 'new', statusImageUrl: '' });
-  const [statusImageFile, setStatusImageFile] = useState(null);
+  const [form, setForm] = useState({ title: '', author: '', price: '', condition: 'new' });
+  const [coverImageFile, setCoverImageFile] = useState(null);
 
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
   }
 
-  function handleStatusImageChange(e) {
+  function handleCoverImageChange(e) {
     const file = e.target.files[0];
     if (file) {
-      setStatusImageFile(file);
-      // Create a preview URL for immediate display
-      const previewUrl = URL.createObjectURL(file);
-      setForm((f) => ({ ...f, statusImageUrl: previewUrl }));
+      setCoverImageFile(file);
     }
   }
 
@@ -494,21 +472,19 @@ function AdminPanel({ books, setBooks }) {
     const title = form.title.trim();
     const author = form.author.trim();
     const priceNum = Number(form.price);
-    const imageUrl = form.imageUrl.trim() || 'https://placehold.co/400x600/38761D/FFFFFF?text=Book+Cover';
     const condition = form.condition || 'new';
-    let statusImageUrl = form.statusImageUrl.trim();
     
     if (!title || !author || !Number.isFinite(priceNum) || priceNum <= 0) return;
-    
-    // If a file was selected, upload it (for now, we'll use the preview URL)
-    // In production, you'd upload to Firebase Storage or another service
-    if (statusImageFile) {
-      // TODO: Upload to Firebase Storage and get the download URL
-      // For now, we'll use the preview URL
+    if (!coverImageFile) {
+      alert('Please select a cover image');
+      return;
     }
     
+    // Create preview URL for immediate display
+    const imageUrl = URL.createObjectURL(coverImageFile);
+    
     const id = `b_${Date.now()}`;
-    const newBook = { id, title, author, price: Math.round(priceNum), imageUrl, condition, statusImageUrl };
+    const newBook = { id, title, author, price: Math.round(priceNum), imageUrl, condition };
     try {
       if (window.firebaseDb) {
         await window.firebaseDb.collection('books').doc(id).set({
@@ -522,8 +498,8 @@ function AdminPanel({ books, setBooks }) {
     } catch (err) {
       console.error('Add book failed', err);
     }
-    setForm({ title: '', author: '', price: '', imageUrl: '', condition: 'new', statusImageUrl: '' });
-    setStatusImageFile(null);
+    setForm({ title: '', author: '', price: '', condition: 'new' });
+    setCoverImageFile(null);
   }
 
   async function handleRemove(id) {
@@ -540,7 +516,7 @@ function AdminPanel({ books, setBooks }) {
   return (
     <section className="mb-6 rounded-xl border border-amber-900/10 bg-white p-4 shadow-sm">
       <h3 className="mb-3 text-base font-semibold text-slate-900">Admin Panel</h3>
-      <form onSubmit={handleAdd} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+      <form onSubmit={handleAdd} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <input
           name="title"
           value={form.title}
@@ -573,18 +549,11 @@ function AdminPanel({ books, setBooks }) {
           <option value="new">جديد (New)</option>
           <option value="used">مستعمل (Used)</option>
         </select>
-        <input
-          name="imageUrl"
-          value={form.imageUrl}
-          onChange={handleChange}
-          placeholder="Cover Image URL (optional)"
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-        />
         <div className="flex flex-col gap-2">
           <input
             type="file"
             accept="image/*"
-            onChange={handleStatusImageChange}
+            onChange={handleCoverImageChange}
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400"
           />
           <button
