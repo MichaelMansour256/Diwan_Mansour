@@ -499,6 +499,16 @@ function AdminPanel({ books, setBooks }) {
       return;
     }
     
+    // Check authentication state
+    if (window.firebaseAuth) {
+      const user = window.firebaseAuth.currentUser;
+      console.log('Current user:', user);
+      if (!user) {
+        alert('You must be logged in to edit books');
+        return;
+      }
+    }
+    
     let imageUrl = editingBook ? editingBook.imageUrl : '';
     
     // Upload new image to ImgBB if a file was selected
@@ -532,11 +542,14 @@ function AdminPanel({ books, setBooks }) {
     
     try {
       if (window.firebaseDb) {
+        console.log('Updating book in Firebase:', id, newBook);
         await window.firebaseDb.collection('books').doc(id).set({
           ...newBook,
           createdAt: editingBook ? editingBook.createdAt : firebase.firestore.FieldValue.serverTimestamp(),
         });
+        console.log('Book updated successfully in Firebase');
       } else {
+        console.log('Firebase not available, updating locally');
         if (editingBook) {
           setBooks((prev) => prev.map(b => b.id === id ? newBook : b));
         } else {
@@ -545,6 +558,7 @@ function AdminPanel({ books, setBooks }) {
       }
     } catch (err) {
       console.error('Add/Update book failed', err);
+      alert('Failed to save book: ' + err.message);
     }
     
     setForm({ title: '', author: '', price: '', condition: 'new' });
@@ -568,6 +582,13 @@ function AdminPanel({ books, setBooks }) {
       <h3 className="mb-3 text-base font-semibold text-slate-900">
         {editingBook ? `Edit Book: ${editingBook.title}` : 'Admin Panel'}
       </h3>
+      
+      {/* Debug info */}
+      <div className="mb-3 rounded-md bg-slate-100 p-2 text-xs">
+        <p>Firebase DB: {window.firebaseDb ? '✅ Connected' : '❌ Not connected'}</p>
+        <p>Firebase Auth: {window.firebaseAuth ? '✅ Available' : '❌ Not available'}</p>
+        <p>Current User: {window.firebaseAuth?.currentUser ? window.firebaseAuth.currentUser.email : 'Not logged in'}</p>
+      </div>
       <form onSubmit={handleAdd} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <input
           name="title"
