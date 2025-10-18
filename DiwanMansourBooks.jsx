@@ -260,11 +260,17 @@ function BookCard({ book, onAddToCart, onViewDetails }) {
         {/* Quantity tag */}
         <div className="absolute top-2 right-2">
           <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-            (book.quantity || 1) > 0
-              ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-600/20' 
-              : 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
+            book.availability === 'available' || !book.availability
+              ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20' 
+              : book.availability === 'reserved'
+              ? 'bg-yellow-100 text-yellow-800 ring-1 ring-yellow-600/20'
+              : book.availability === 'sold'
+              ? 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
+              : 'bg-gray-100 text-gray-800 ring-1 ring-gray-600/20'
           }`}>
-            {(book.quantity || 1) > 0 ? `${book.quantity || 1} متوفر` : 'نفذ'}
+            {book.availability === 'available' || !book.availability ? 'متوفر' :
+             book.availability === 'reserved' ? 'محجوز' :
+             book.availability === 'sold' ? 'مباع' : 'غير متوفر'}
           </span>
         </div>
       </div>
@@ -604,12 +610,14 @@ export default function App() {
   }
 
   function addToCart(book) {
-    // Check if book has available quantity
-    const availableQuantity = book.quantity || 1;
-    const cartQuantity = cartItems.find(ci => ci.bookId === book.id)?.quantity || 0;
-    
-    if (cartQuantity >= availableQuantity) {
-      alert(`Sorry, only ${availableQuantity} copy(ies) available for "${book.title}"`);
+    // Check if book is available
+    if (book.availability && book.availability !== 'available') {
+      const statusMessages = {
+        'reserved': 'This book is currently reserved by another customer',
+        'sold': 'This book has been sold',
+        'unavailable': 'This book is currently unavailable'
+      };
+      alert(statusMessages[book.availability] || 'This book is not available');
       return;
     }
     
@@ -626,34 +634,28 @@ export default function App() {
       ];
     });
     
-    // Update book quantity in the books array
+    // Mark book as reserved when added to cart
     setBooks((prevBooks) => 
       prevBooks.map(b => 
         b.id === book.id 
-          ? { ...b, quantity: Math.max(0, (b.quantity || 1) - 1) }
+          ? { ...b, availability: 'reserved', reservedAt: Date.now() }
           : b
       )
     );
   }
 
   function removeFromCart(bookId) {
-    // Find the cart item to get its quantity
-    const cartItem = cartItems.find(ci => ci.bookId === bookId);
-    const quantityToRestore = cartItem?.quantity || 0;
-    
     // Remove from cart
     setCartItems((prev) => prev.filter((ci) => ci.bookId !== bookId));
     
-    // Restore quantity to the book
-    if (quantityToRestore > 0) {
-      setBooks((prevBooks) => 
-        prevBooks.map(b => 
-          b.id === bookId 
-            ? { ...b, quantity: (b.quantity || 1) + quantityToRestore }
-            : b
-        )
-      );
-    }
+    // Restore book availability when removed from cart
+    setBooks((prevBooks) => 
+      prevBooks.map(b => 
+        b.id === bookId 
+          ? { ...b, availability: 'available', reservedAt: null }
+          : b
+      )
+    );
   }
 
   const totalPrice = useMemo(
@@ -667,9 +669,9 @@ export default function App() {
   );
 
   const filteredBooks = useMemo(() => {
-    // Filter books that have quantity > 0 (available books)
+    // Filter books that are available (not reserved, sold, or unavailable)
     const availableBooks = books.filter(book => 
-      (book.quantity || 1) > 0 // Default to 1 if quantity doesn't exist
+      book.availability === 'available' || !book.availability // Default to available if field doesn't exist
     );
     
     // Then apply search filter if there's a search query
@@ -695,6 +697,30 @@ export default function App() {
       setCurrentSection('books');
     }
   };
+
+  // Auto-release reserved books after 24 hours
+  useEffect(() => {
+    const autoReleaseReservedBooks = () => {
+      const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+      
+      setBooks(prevBooks => {
+        return prevBooks.map(book => {
+          if (book.availability === 'reserved' && book.reservedAt && book.reservedAt < twentyFourHoursAgo) {
+            return { ...book, availability: 'available', reservedAt: null };
+          }
+          return book;
+        });
+      });
+    };
+
+    // Run auto-release check every 30 minutes
+    const interval = setInterval(autoReleaseReservedBooks, 30 * 60 * 1000);
+    
+    // Run once on mount
+    autoReleaseReservedBooks();
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-amber-50 to-orange-50">
@@ -964,7 +990,7 @@ export default function App() {
 }
 
 function AdminPanel({ books, setBooks }) {
-  const [form, setForm] = useState({ title: '', author: '', price: '', condition: 'new', quantity: 1 });
+  const [form, setForm] = useState({ title: '', author: '', price: '', condition: 'new', quantity: 1, availability: 'available' });
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [editingBook, setEditingBook] = useState(null);
 
@@ -987,14 +1013,15 @@ function AdminPanel({ books, setBooks }) {
       author: book.author,
       price: book.price.toString(),
       condition: book.condition,
-      quantity: book.quantity || 1
+      quantity: book.quantity || 1,
+      availability: book.availability || 'available'
     });
     setCoverImageFile(null);
   }
 
   function cancelEdit() {
     setEditingBook(null);
-    setForm({ title: '', author: '', price: '', condition: 'new', quantity: 1 });
+    setForm({ title: '', author: '', price: '', condition: 'new', quantity: 1, availability: 'available' });
     setCoverImageFile(null);
   }
 
@@ -1005,6 +1032,7 @@ function AdminPanel({ books, setBooks }) {
     const priceNum = Number(form.price);
     const condition = form.condition || 'new';
     const quantity = Number(form.quantity) || 1;
+    const availability = form.availability || 'available';
     
     if (!title || !author || !Number.isFinite(priceNum) || priceNum <= 0) return;
     if (!coverImageFile && !editingBook) {
@@ -1058,7 +1086,9 @@ function AdminPanel({ books, setBooks }) {
       price: Math.round(priceNum), 
       imageUrl, 
       condition, 
-      quantity: Math.max(1, Math.round(quantity))
+      quantity: Math.max(1, Math.round(quantity)),
+      availability,
+      reservedAt: availability === 'reserved' ? Date.now() : null
     };
     
     try {
@@ -1083,7 +1113,7 @@ function AdminPanel({ books, setBooks }) {
       alert('Failed to save book: ' + err.message);
     }
     
-    setForm({ title: '', author: '', price: '', condition: 'new', quantity: 1 });
+    setForm({ title: '', author: '', price: '', condition: 'new', quantity: 1, availability: 'available' });
     setCoverImageFile(null);
     setEditingBook(null);
   }
@@ -1153,6 +1183,17 @@ function AdminPanel({ books, setBooks }) {
           min="1"
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
         />
+        <select
+          name="availability"
+          value={form.availability}
+          onChange={handleChange}
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+        >
+          <option value="available">متوفر (Available)</option>
+          <option value="reserved">محجوز (Reserved)</option>
+          <option value="sold">مباع (Sold)</option>
+          <option value="unavailable">غير متوفر (Unavailable)</option>
+        </select>
         <div className="flex flex-col gap-2">
           <input
             type="file"
