@@ -605,76 +605,104 @@ export default function App() {
         />
       ) : (
         <>
-          {/* Main Section */}
+          {/* Main Section - Landing Page */}
           {currentSection === 'main' && (
-            <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <>
               {/* Admin controls - only show on admin route */}
               {isAdminRoute && (
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={openAdmin}
-                      className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                    >
-                      {isAdminOpen ? 'Close Admin' : 'Open Admin'}
-                    </button>
-                    {isAdminAuthed && (
+                <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={handleAdminLogout}
-                        className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                        onClick={openAdmin}
+                        className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
                       >
-                        Logout
+                        {isAdminOpen ? 'Close Admin' : 'Open Admin'}
                       </button>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {isAdminRoute && isAdminOpen && isAdminAuthed && (
-                <AdminPanel books={books} setBooks={setBooks} />
-              )}
-
-              {/* Admin login prompt for admin route */}
-              {isAdminRoute && !isAdminAuthed && (
-                <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
-                  <h3 className="text-lg font-semibold text-amber-800">Admin Access Required</h3>
-                  <p className="text-sm text-amber-700">Please log in to access the admin panel.</p>
-                  <button
-                    type="button"
-                    onClick={() => setIsAuthModalOpen(true)}
-                    className="mt-2 rounded-md bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
-                  >
-                    Login
-                  </button>
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-                {/* Books grid */}
-                <section className="lg:col-span-9">
-                  <div className="mb-4 flex items-end justify-between">
-                    <div>
-                      <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
-                        Featured Books
-                      </h2>
-                      <p className="text-sm text-slate-600">Browse our curated selection</p>
-                    </div>
-                    <div className="hidden text-sm text-slate-600 lg:block">
-                      {cartItems.length > 0 ? (
-                        <span>
-                          {cartItems.length} item{cartItems.length > 1 ? 's' : ''} in cart •{' '}
-                          {formatCurrencyEGP(totalPrice)}
-                        </span>
-                      ) : (
-                        <span>Cart is empty</span>
+                      {isAdminAuthed && (
+                        <button
+                          type="button"
+                          onClick={handleAdminLogout}
+                          className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                        >
+                          Logout
+                        </button>
                       )}
                     </div>
                   </div>
+
+                  {isAdminOpen && isAdminAuthed && (
+                    <AdminPanel books={books} setBooks={setBooks} />
+                  )}
+
+                  {/* Admin login prompt for admin route */}
+                  {!isAdminAuthed && (
+                    <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
+                      <h3 className="text-lg font-semibold text-amber-800">Admin Access Required</h3>
+                      <p className="text-sm text-amber-700">Please log in to access the admin panel.</p>
+                      <button
+                        type="button"
+                        onClick={() => setIsAuthModalOpen(true)}
+                        className="mt-2 rounded-md bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
+                      >
+                        Login
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Hero Section */}
+              <section className="py-16 bg-gradient-to-b from-amber-50 to-white">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                  <div className="text-center">
+                    <div className="mx-auto mb-8 flex h-32 w-32 items-center justify-center rounded-full bg-white shadow-lg ring-1 ring-amber-200/50">
+                      <img 
+                        src="./logo.png" 
+                        alt="Diwan Mansour for Books" 
+                        className="h-24 w-24 rounded-full object-contain"
+                      />
+                    </div>
+                    <h1 className="text-4xl font-bold text-slate-900 sm:text-5xl lg:text-6xl">
+                      Diwan Mansour
+                    </h1>
+                    <h2 className="mt-2 text-2xl font-semibold text-amber-700 sm:text-3xl">
+                      for Books
+                    </h2>
+                    <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600">
+                      Discover a world of knowledge with our curated collection of new and used books. 
+                      From classics to contemporary works, find your next great read.
+                    </p>
+                    <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
+                      <button
+                        onClick={() => handleNavigate('books')}
+                        className="rounded-lg bg-amber-700 px-8 py-3 text-lg font-semibold text-white shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
+                      >
+                        Browse All Books
+                      </button>
+                      <button
+                        onClick={() => handleNavigate('contact')}
+                        className="rounded-lg border-2 border-amber-700 px-8 py-3 text-lg font-semibold text-amber-700 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
+                      >
+                        Contact Us
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Featured Books Section */}
+              <section className="py-16 bg-white">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                  <div className="text-center mb-12">
+                    <h2 className="text-3xl font-bold text-slate-900">Featured Books</h2>
+                    <p className="mt-4 text-lg text-slate-600">Handpicked selections from our collection</p>
+                  </div>
+                  
                   {isBooksReady ? (
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
-                      {books.slice(0, 8).map((book) => (
+                    <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+                      {books.slice(0, 6).map((book) => (
                         <BookCard 
                           key={book.id} 
                           book={book} 
@@ -687,15 +715,64 @@ export default function App() {
                     <div className="py-10 text-center text-sm text-slate-500">Loading…</div>
                   )}
                   
-                  {/* View All Books Button */}
-                  <div className="mt-6 text-center">
+                  <div className="mt-12 text-center">
                     <button
                       onClick={() => handleNavigate('books')}
-                      className="rounded-lg bg-amber-700 px-6 py-3 text-white font-medium hover:bg-amber-600 transition-colors"
+                      className="rounded-lg bg-amber-700 px-8 py-3 text-lg font-semibold text-white shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
                     >
-                      View All Books
+                      View Complete Collection
                     </button>
                   </div>
+                </div>
+              </section>
+
+              {/* Stats Section */}
+              <section className="py-16 bg-gradient-to-r from-amber-50 to-orange-50">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                  <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-amber-700">{books.length}+</div>
+                      <div className="mt-2 text-lg text-slate-600">Books Available</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-amber-700">New & Used</div>
+                      <div className="mt-2 text-lg text-slate-600">Book Conditions</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-amber-700">24/7</div>
+                      <div className="mt-2 text-lg text-slate-600">WhatsApp Support</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </>
+          )}
+
+          {/* Books Section */}
+          {currentSection === 'books' && (
+            <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-slate-900">All Books</h2>
+                <p className="text-slate-600">Browse our complete collection</p>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+                {/* Books grid */}
+                <section className="lg:col-span-9">
+                  {isBooksReady ? (
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+                      {books.map((book) => (
+                        <BookCard 
+                          key={book.id} 
+                          book={book} 
+                          onAddToCart={addToCart}
+                          onViewDetails={setSelectedBook}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="py-10 text-center text-sm text-slate-500">Loading…</div>
+                  )}
                 </section>
 
                 {/* Desktop sidebar */}
@@ -707,31 +784,6 @@ export default function App() {
                   />
                 </div>
               </div>
-            </main>
-          )}
-
-          {/* Books Section */}
-          {currentSection === 'books' && (
-            <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-900">All Books</h2>
-                <p className="text-slate-600">Browse our complete collection</p>
-              </div>
-              
-              {isBooksReady ? (
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                  {books.map((book) => (
-                    <BookCard 
-                      key={book.id} 
-                      book={book} 
-                      onAddToCart={addToCart}
-                      onViewDetails={setSelectedBook}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="py-10 text-center text-sm text-slate-500">Loading…</div>
-              )}
             </main>
           )}
 
