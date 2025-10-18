@@ -110,10 +110,10 @@ function Header({ onToggleCart, cartItemsCount }) {
   );
 }
 
-function BookCard({ book, onAddToCart }) {
+function BookCard({ book, onAddToCart, onViewDetails }) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl border border-amber-900/10 bg-white shadow-sm transition hover:shadow-md">
-      <div className="relative aspect-[2/3] w-full overflow-hidden bg-stone-50">
+      <div className="relative aspect-[2/3] w-full overflow-hidden bg-stone-50 cursor-pointer" onClick={() => onViewDetails(book)}>
         <img
           src={book.imageUrl}
           alt={`${book.title} cover`}
@@ -133,7 +133,7 @@ function BookCard({ book, onAddToCart }) {
       </div>
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-3">
-          <h3 className="line-clamp-2 text-base font-semibold text-slate-900">{book.title}</h3>
+          <h3 className="line-clamp-2 text-base font-semibold text-slate-900 cursor-pointer hover:text-amber-700" onClick={() => onViewDetails(book)}>{book.title}</h3>
           <p className="mt-1 text-sm text-slate-600">{book.author}</p>
         </div>
         <div className="mt-auto flex items-center justify-between">
@@ -147,6 +147,107 @@ function BookCard({ book, onAddToCart }) {
           >
             Add to Cart
           </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BookDetail({ book, onAddToCart, onBack }) {
+  if (!book) return null;
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+      {/* Back button */}
+      <button
+        onClick={onBack}
+        className="mb-6 inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+      >
+        <span>←</span>
+        Back to Books
+      </button>
+
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        {/* Book Image */}
+        <div className="space-y-4">
+          <div className="relative aspect-[2/3] w-full overflow-hidden rounded-xl bg-stone-50">
+            <img
+              src={book.imageUrl}
+              alt={`${book.title} cover`}
+              className="h-full w-full object-cover"
+            />
+            {/* Condition tag */}
+            <div className="absolute top-4 left-4">
+              <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+                book.condition === 'new' 
+                  ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20' 
+                  : 'bg-orange-100 text-orange-800 ring-1 ring-orange-600/20'
+              }`}>
+                {book.condition === 'new' ? 'جديد' : 'مستعمل'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Book Details */}
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">{book.title}</h1>
+            <p className="mt-2 text-xl text-slate-600">by {book.author}</p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <span className="text-3xl font-bold text-green-800">
+                {formatCurrencyEGP(book.price)}
+              </span>
+              <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+                book.condition === 'new' 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-orange-100 text-orange-800'
+              }`}>
+                {book.condition === 'new' ? 'New Book' : 'Used Book'}
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-slate-900">Book Information</h3>
+              <div className="space-y-2 text-sm text-slate-600">
+                <div className="flex justify-between">
+                  <span>Title:</span>
+                  <span className="font-medium">{book.title}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Author:</span>
+                  <span className="font-medium">{book.author}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Condition:</span>
+                  <span className="font-medium">{book.condition === 'new' ? 'New' : 'Used'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Price:</span>
+                  <span className="font-medium text-green-800">{formatCurrencyEGP(book.price)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4">
+              <button
+                onClick={() => onAddToCart(book)}
+                className="w-full rounded-lg bg-amber-700 px-6 py-3 text-lg font-semibold text-white shadow hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              >
+                Add to Cart
+              </button>
+            </div>
+
+            <div className="rounded-lg bg-amber-50 p-4">
+              <h4 className="font-semibold text-amber-800">📞 Contact Information</h4>
+              <p className="mt-2 text-sm text-amber-700">
+                For questions about this book or to place an order, please contact us via WhatsApp.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -291,6 +392,7 @@ export default function App() {
   const [isBooksReady, setIsBooksReady] = useState(false);
   const [cartItems, setCartItems] = useState([]);
   const [isAdminRoute, setIsAdminRoute] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
 
   // Check for admin route and load admin auth
   useEffect(() => {
@@ -383,92 +485,106 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-amber-50 to-orange-50">
       <Header onToggleCart={() => setIsCartOpenOnMobile((v) => !v)} cartItemsCount={cartItemsCount} />
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* Admin controls - only show on admin route */}
-        {isAdminRoute && (
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={openAdmin}
-                className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              >
-                {isAdminOpen ? 'Close Admin' : 'Open Admin'}
-              </button>
-              {isAdminAuthed && (
+      {/* Show book detail page if a book is selected */}
+      {selectedBook ? (
+        <BookDetail 
+          book={selectedBook} 
+          onAddToCart={addToCart}
+          onBack={() => setSelectedBook(null)}
+        />
+      ) : (
+        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          {/* Admin controls - only show on admin route */}
+          {isAdminRoute && (
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={handleAdminLogout}
-                  className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  onClick={openAdmin}
+                  className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
                 >
-                  Logout
+                  {isAdminOpen ? 'Close Admin' : 'Open Admin'}
                 </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {isAdminRoute && isAdminOpen && isAdminAuthed && (
-          <AdminPanel books={books} setBooks={setBooks} />
-        )}
-
-        {/* Admin login prompt for admin route */}
-        {isAdminRoute && !isAdminAuthed && (
-          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
-            <h3 className="text-lg font-semibold text-amber-800">Admin Access Required</h3>
-            <p className="text-sm text-amber-700">Please log in to access the admin panel.</p>
-            <button
-              type="button"
-              onClick={() => setIsAuthModalOpen(true)}
-              className="mt-2 rounded-md bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
-            >
-              Login
-            </button>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          {/* Books grid */}
-          <section className="lg:col-span-9">
-            <div className="mb-4 flex items-end justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
-                  Featured Books
-                </h2>
-                <p className="text-sm text-slate-600">Browse our curated selection</p>
-              </div>
-              <div className="hidden text-sm text-slate-600 lg:block">
-                {cartItems.length > 0 ? (
-                  <span>
-                    {cartItems.length} item{cartItems.length > 1 ? 's' : ''} in cart •{' '}
-                    {formatCurrencyEGP(totalPrice)}
-                  </span>
-                ) : (
-                  <span>Cart is empty</span>
+                {isAdminAuthed && (
+                  <button
+                    type="button"
+                    onClick={handleAdminLogout}
+                    className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  >
+                    Logout
+                  </button>
                 )}
               </div>
             </div>
-            {isBooksReady ? (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
-                {books.map((book) => (
-                  <BookCard key={book.id} book={book} onAddToCart={addToCart} />
-                ))}
-              </div>
-            ) : (
-              <div className="py-10 text-center text-sm text-slate-500">Loading…</div>
-            )}
-          </section>
+          )}
 
-          {/* Desktop sidebar */}
-          <div className="lg:col-span-3">
-            <CartSidebarDesktop
-              cartItems={cartItems}
-              onRemoveItem={removeFromCart}
-              totalPrice={totalPrice}
-            />
+          {isAdminRoute && isAdminOpen && isAdminAuthed && (
+            <AdminPanel books={books} setBooks={setBooks} />
+          )}
+
+          {/* Admin login prompt for admin route */}
+          {isAdminRoute && !isAdminAuthed && (
+            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
+              <h3 className="text-lg font-semibold text-amber-800">Admin Access Required</h3>
+              <p className="text-sm text-amber-700">Please log in to access the admin panel.</p>
+              <button
+                type="button"
+                onClick={() => setIsAuthModalOpen(true)}
+                className="mt-2 rounded-md bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
+              >
+                Login
+              </button>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+            {/* Books grid */}
+            <section className="lg:col-span-9">
+              <div className="mb-4 flex items-end justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
+                    Featured Books
+                  </h2>
+                  <p className="text-sm text-slate-600">Browse our curated selection</p>
+                </div>
+                <div className="hidden text-sm text-slate-600 lg:block">
+                  {cartItems.length > 0 ? (
+                    <span>
+                      {cartItems.length} item{cartItems.length > 1 ? 's' : ''} in cart •{' '}
+                      {formatCurrencyEGP(totalPrice)}
+                    </span>
+                  ) : (
+                    <span>Cart is empty</span>
+                  )}
+                </div>
+              </div>
+              {isBooksReady ? (
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+                  {books.map((book) => (
+                    <BookCard 
+                      key={book.id} 
+                      book={book} 
+                      onAddToCart={addToCart}
+                      onViewDetails={setSelectedBook}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="py-10 text-center text-sm text-slate-500">Loading…</div>
+              )}
+            </section>
+
+            {/* Desktop sidebar */}
+            <div className="lg:col-span-3">
+              <CartSidebarDesktop
+                cartItems={cartItems}
+                onRemoveItem={removeFromCart}
+                totalPrice={totalPrice}
+              />
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      )}
 
       {/* Mobile modal */}
       <CartModalMobile
