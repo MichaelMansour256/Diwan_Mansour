@@ -260,17 +260,11 @@ function BookCard({ book, onAddToCart, onViewDetails }) {
         {/* Quantity tag */}
         <div className="absolute top-2 right-2">
           <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-            book.availability === 'available' || !book.availability
-              ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20' 
-              : book.availability === 'reserved'
-              ? 'bg-yellow-100 text-yellow-800 ring-1 ring-yellow-600/20'
-              : book.availability === 'sold'
-              ? 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
-              : 'bg-gray-100 text-gray-800 ring-1 ring-gray-600/20'
+            (book.quantity || 1) > 0
+              ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-600/20' 
+              : 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
           }`}>
-            {book.availability === 'available' || !book.availability ? 'متوفر' :
-             book.availability === 'reserved' ? 'محجوز' :
-             book.availability === 'sold' ? 'مباع' : 'غير متوفر'}
+            {(book.quantity || 1) > 0 ? `${book.quantity || 1} متوفر` : 'نفذ'}
           </span>
         </div>
       </div>
@@ -441,7 +435,7 @@ function WhatsAppCheckoutButton({ cartItems, totalPrice }) {
   );
 }
 
-function CartList({ cartItems, onRemoveItem, totalPrice }) {
+function CartList({ cartItems, onRemoveItem, onReduceQuantity, totalPrice }) {
   return (
     <div className="flex h-full flex-col">
       {cartItems.length === 0 ? (
@@ -450,21 +444,35 @@ function CartList({ cartItems, onRemoveItem, totalPrice }) {
         <ul className="-mx-2 flex-1 space-y-3 overflow-y-auto px-2">
           {cartItems.map((item) => (
             <li key={item.bookId} className="flex items-center justify-between rounded-lg border border-slate-200 p-3">
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-slate-900">{item.title}</p>
-                <p className="text-xs text-slate-600">Qty: {item.quantity}</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="text-xs text-slate-600">Qty:</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => onReduceQuantity(item.bookId)}
+                      className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-700 hover:bg-slate-200"
+                    >
+                      -
+                    </button>
+                    <span className="min-w-[20px] text-center text-xs font-medium text-slate-900">
+                      {item.quantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => onRemoveItem(item.bookId)}
+                      className="flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-xs font-medium text-red-700 hover:bg-red-200"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-sm font-semibold text-green-800">
                   {formatCurrencyEGP(item.price * item.quantity)}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => onRemoveItem(item.bookId)}
-                  className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200"
-                >
-                  Remove
-                </button>
               </div>
             </li>
           ))}
@@ -480,7 +488,7 @@ function CartList({ cartItems, onRemoveItem, totalPrice }) {
   );
 }
 
-function CartSidebarDesktop({ cartItems, onRemoveItem, totalPrice }) {
+function CartSidebarDesktop({ cartItems, onRemoveItem, onReduceQuantity, totalPrice }) {
   const cartItemsCount = cartItems.reduce((sum, ci) => sum + ci.quantity, 0);
   
   return (
@@ -494,14 +502,14 @@ function CartSidebarDesktop({ cartItems, onRemoveItem, totalPrice }) {
             </span>
           )}
         </div>
-        <CartList cartItems={cartItems} onRemoveItem={onRemoveItem} totalPrice={totalPrice} />
+        <CartList cartItems={cartItems} onRemoveItem={onRemoveItem} onReduceQuantity={onReduceQuantity} totalPrice={totalPrice} />
         <WhatsAppCheckoutButton cartItems={cartItems} totalPrice={totalPrice} />
       </div>
     </aside>
   );
 }
 
-function CartModalMobile({ isOpen, onClose, cartItems, onRemoveItem, totalPrice }) {
+function CartModalMobile({ isOpen, onClose, cartItems, onRemoveItem, onReduceQuantity, totalPrice }) {
   return (
     <div
       className={`lg:hidden ${
@@ -529,7 +537,7 @@ function CartModalMobile({ isOpen, onClose, cartItems, onRemoveItem, totalPrice 
             </button>
           </div>
           <div className="flex h-[calc(70vh-3rem)] flex-col">
-            <CartList cartItems={cartItems} onRemoveItem={onRemoveItem} totalPrice={totalPrice} />
+            <CartList cartItems={cartItems} onRemoveItem={onRemoveItem} onReduceQuantity={onReduceQuantity} totalPrice={totalPrice} />
             <WhatsAppCheckoutButton cartItems={cartItems} totalPrice={totalPrice} />
           </div>
         </div>
@@ -621,6 +629,15 @@ export default function App() {
       return;
     }
     
+    // Check if we're trying to add more copies than available
+    const availableQuantity = book.quantity || 1;
+    const currentCartQuantity = cartItems.find(ci => ci.bookId === book.id)?.quantity || 0;
+    
+    if (currentCartQuantity >= availableQuantity) {
+      alert(`Sorry, only ${availableQuantity} copy(ies) available for "${book.title}"`);
+      return;
+    }
+    
     setCartItems((prev) => {
       const existing = prev.find((ci) => ci.bookId === book.id);
       if (existing) {
@@ -634,28 +651,62 @@ export default function App() {
       ];
     });
     
-    // Mark book as reserved when added to cart
+    // Update book quantity (reduce available quantity)
     setBooks((prevBooks) => 
       prevBooks.map(b => 
         b.id === book.id 
-          ? { ...b, availability: 'reserved', reservedAt: Date.now() }
+          ? { ...b, quantity: Math.max(0, (b.quantity || 1) - 1) }
           : b
       )
     );
   }
 
   function removeFromCart(bookId) {
+    // Find the cart item to get its quantity
+    const cartItem = cartItems.find(ci => ci.bookId === bookId);
+    const quantityToRestore = cartItem?.quantity || 0;
+    
     // Remove from cart
     setCartItems((prev) => prev.filter((ci) => ci.bookId !== bookId));
     
-    // Restore book availability when removed from cart
-    setBooks((prevBooks) => 
-      prevBooks.map(b => 
-        b.id === bookId 
-          ? { ...b, availability: 'available', reservedAt: null }
-          : b
-      )
-    );
+    // Restore quantity to the book
+    if (quantityToRestore > 0) {
+      setBooks((prevBooks) => 
+        prevBooks.map(b => 
+          b.id === bookId 
+            ? { ...b, quantity: (b.quantity || 1) + quantityToRestore }
+            : b
+        )
+      );
+    }
+  }
+
+  function reduceCartQuantity(bookId) {
+    const cartItem = cartItems.find(ci => ci.bookId === bookId);
+    if (!cartItem) return;
+    
+    if (cartItem.quantity === 1) {
+      // If only 1 item, remove completely
+      removeFromCart(bookId);
+    } else {
+      // Reduce quantity by 1
+      setCartItems((prev) => 
+        prev.map(ci => 
+          ci.bookId === bookId 
+            ? { ...ci, quantity: ci.quantity - 1 }
+            : ci
+        )
+      );
+      
+      // Restore 1 quantity to the book
+      setBooks((prevBooks) => 
+        prevBooks.map(b => 
+          b.id === bookId 
+            ? { ...b, quantity: (b.quantity || 1) + 1 }
+            : b
+        )
+      );
+    }
   }
 
   const totalPrice = useMemo(
@@ -669,9 +720,9 @@ export default function App() {
   );
 
   const filteredBooks = useMemo(() => {
-    // Filter books that are available (not reserved, sold, or unavailable)
+    // Filter books that have quantity > 0 (available books)
     const availableBooks = books.filter(book => 
-      book.availability === 'available' || !book.availability // Default to available if field doesn't exist
+      (book.quantity || 1) > 0 // Default to 1 if quantity doesn't exist
     );
     
     // Then apply search filter if there's a search query
@@ -951,6 +1002,7 @@ export default function App() {
                   <CartSidebarDesktop
                     cartItems={cartItems}
                     onRemoveItem={removeFromCart}
+                    onReduceQuantity={reduceCartQuantity}
                     totalPrice={totalPrice}
                   />
                 </div>
@@ -971,6 +1023,7 @@ export default function App() {
         onClose={() => setIsCartOpenOnMobile(false)}
         cartItems={cartItems}
         onRemoveItem={removeFromCart}
+        onReduceQuantity={reduceCartQuantity}
         totalPrice={totalPrice}
       />
 
