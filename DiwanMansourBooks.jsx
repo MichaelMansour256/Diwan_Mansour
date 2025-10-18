@@ -257,6 +257,16 @@ function BookCard({ book, onAddToCart, onViewDetails }) {
             {book.condition === 'new' ? 'جديد' : 'مستعمل'}
           </span>
         </div>
+        {/* Availability tag */}
+        <div className="absolute top-2 right-2">
+          <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+            book.availability === 'available' || !book.availability
+              ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20' 
+              : 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
+          }`}>
+            {book.availability === 'available' || !book.availability ? 'متوفر' : 'محجوز'}
+          </span>
+        </div>
       </div>
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-3">
@@ -623,10 +633,29 @@ export default function App() {
   );
 
   const filteredBooks = useMemo(() => {
-    if (!searchQuery.trim()) return books;
+    // First filter by availability - only show available books to customers
+    // Auto-hide reserved books that have been reserved for more than 7 days
+    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    const availableBooks = books.filter(book => {
+      // Show available books
+      if (book.availability === 'available' || !book.availability) return true;
+      
+      // Hide reserved books that are older than 7 days
+      if (book.availability === 'reserved' && book.reservedAt && book.reservedAt < sevenDaysAgo) {
+        return false; // Auto-hide old reserved books
+      }
+      
+      // Show recently reserved books (less than 7 days)
+      if (book.availability === 'reserved') return true;
+      
+      return false;
+    });
+    
+    // Then apply search filter if there's a search query
+    if (!searchQuery.trim()) return availableBooks;
     
     const query = searchQuery.toLowerCase().trim();
-    return books.filter(book => 
+    return availableBooks.filter(book => 
       book.title.toLowerCase().includes(query) ||
       book.author.toLowerCase().includes(query)
     );
@@ -914,7 +943,7 @@ export default function App() {
 }
 
 function AdminPanel({ books, setBooks }) {
-  const [form, setForm] = useState({ title: '', author: '', price: '', condition: 'new' });
+  const [form, setForm] = useState({ title: '', author: '', price: '', condition: 'new', availability: 'available' });
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [editingBook, setEditingBook] = useState(null);
 
@@ -936,14 +965,15 @@ function AdminPanel({ books, setBooks }) {
       title: book.title,
       author: book.author,
       price: book.price.toString(),
-      condition: book.condition
+      condition: book.condition,
+      availability: book.availability || 'available'
     });
     setCoverImageFile(null);
   }
 
   function cancelEdit() {
     setEditingBook(null);
-    setForm({ title: '', author: '', price: '', condition: 'new' });
+    setForm({ title: '', author: '', price: '', condition: 'new', availability: 'available' });
     setCoverImageFile(null);
   }
 
@@ -953,6 +983,7 @@ function AdminPanel({ books, setBooks }) {
     const author = form.author.trim();
     const priceNum = Number(form.price);
     const condition = form.condition || 'new';
+    const availability = form.availability || 'available';
     
     if (!title || !author || !Number.isFinite(priceNum) || priceNum <= 0) return;
     if (!coverImageFile && !editingBook) {
@@ -999,7 +1030,16 @@ function AdminPanel({ books, setBooks }) {
     }
     
     const id = editingBook ? editingBook.id : `b_${Date.now()}`;
-    const newBook = { id, title, author, price: Math.round(priceNum), imageUrl, condition };
+    const newBook = { 
+      id, 
+      title, 
+      author, 
+      price: Math.round(priceNum), 
+      imageUrl, 
+      condition, 
+      availability,
+      reservedAt: availability === 'reserved' ? Date.now() : null
+    };
     
     try {
       if (window.firebaseDb) {
@@ -1023,7 +1063,7 @@ function AdminPanel({ books, setBooks }) {
       alert('Failed to save book: ' + err.message);
     }
     
-    setForm({ title: '', author: '', price: '', condition: 'new' });
+    setForm({ title: '', author: '', price: '', condition: 'new', availability: 'available' });
     setCoverImageFile(null);
     setEditingBook(null);
   }
@@ -1083,6 +1123,15 @@ function AdminPanel({ books, setBooks }) {
         >
           <option value="new">جديد (New)</option>
           <option value="used">مستعمل (Used)</option>
+        </select>
+        <select
+          name="availability"
+          value={form.availability}
+          onChange={handleChange}
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+        >
+          <option value="available">متوفر (Available)</option>
+          <option value="reserved">تم حجزه (Reserved)</option>
         </select>
         <div className="flex flex-col gap-2">
           <input
