@@ -76,6 +76,95 @@ function formatCurrencyEGP(amount) {
   }).format(amount);
 }
 
+function FloatingNav({ currentSection, onNavigate }) {
+  return (
+    <nav className="fixed top-4 left-1/2 z-50 -translate-x-1/2 transform">
+      <div className="flex items-center gap-1 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/50 shadow-lg px-4 py-2">
+        <button
+          onClick={() => onNavigate('main')}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            currentSection === 'main' 
+              ? 'bg-amber-700 text-white' 
+              : 'text-slate-700 hover:bg-amber-100'
+          }`}
+        >
+          Main
+        </button>
+        <button
+          onClick={() => onNavigate('books')}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            currentSection === 'books' 
+              ? 'bg-amber-700 text-white' 
+              : 'text-slate-700 hover:bg-amber-100'
+          }`}
+        >
+          Books
+        </button>
+        <button
+          onClick={() => onNavigate('contact')}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            currentSection === 'contact' 
+              ? 'bg-amber-700 text-white' 
+              : 'text-slate-700 hover:bg-amber-100'
+          }`}
+        >
+          Contact Us
+        </button>
+      </div>
+    </nav>
+  );
+}
+
+function ContactSection() {
+  return (
+    <section id="contact" className="py-16 bg-white">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-slate-900">Contact Us</h2>
+          <p className="mt-4 text-lg text-slate-600">Get in touch with Diwan Mansour for Books</p>
+        </div>
+        
+        <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div className="rounded-xl bg-amber-50 p-8">
+            <h3 className="text-xl font-semibold text-amber-800 mb-4">📞 WhatsApp</h3>
+            <p className="text-slate-700 mb-4">Contact us directly via WhatsApp for quick responses and orders.</p>
+            <a 
+              href="https://wa.me/201201129135" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-white font-medium hover:bg-green-700 transition-colors"
+            >
+              <span>📱</span>
+              Chat on WhatsApp
+            </a>
+          </div>
+          
+          <div className="rounded-xl bg-slate-50 p-8">
+            <h3 className="text-xl font-semibold text-slate-800 mb-4">📧 Email</h3>
+            <p className="text-slate-700 mb-4">Send us an email for inquiries about book availability and orders.</p>
+            <a 
+              href="mailto:info@diwanmansour.com" 
+              className="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-6 py-3 text-white font-medium hover:bg-slate-800 transition-colors"
+            >
+              <span>✉️</span>
+              Send Email
+            </a>
+          </div>
+        </div>
+        
+        <div className="mt-12 text-center">
+          <div className="rounded-xl bg-gradient-to-r from-amber-100 to-orange-100 p-8">
+            <h3 className="text-xl font-semibold text-amber-800 mb-4">🕒 Business Hours</h3>
+            <p className="text-slate-700">Monday - Friday: 9:00 AM - 6:00 PM</p>
+            <p className="text-slate-700">Saturday: 10:00 AM - 4:00 PM</p>
+            <p className="text-slate-600 mt-2">Sunday: Closed</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Header({ onToggleCart, cartItemsCount }) {
   return (
     <header className="sticky top-0 z-30 w-full border-b border-amber-900/20 bg-amber-800 text-amber-50">
@@ -405,6 +494,7 @@ export default function App() {
   const [cartItems, setCartItems] = useState([]);
   const [isAdminRoute, setIsAdminRoute] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
+  const [currentSection, setCurrentSection] = useState('main');
 
   // Check for admin route and load admin auth
   useEffect(() => {
@@ -493,8 +583,16 @@ export default function App() {
     [cartItems]
   );
 
+  const handleNavigate = (section) => {
+    setCurrentSection(section);
+    if (section === 'books') {
+      setSelectedBook(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-amber-50 to-orange-50">
+      <FloatingNav currentSection={currentSection} onNavigate={handleNavigate} />
       <Header onToggleCart={() => setIsCartOpenOnMobile((v) => !v)} cartItemsCount={cartItemsCount} />
 
       {/* Show book detail page if a book is selected */}
@@ -506,73 +604,122 @@ export default function App() {
           cartItemsCount={cartItemsCount}
         />
       ) : (
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          {/* Admin controls - only show on admin route */}
-          {isAdminRoute && (
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={openAdmin}
-                  className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                >
-                  {isAdminOpen ? 'Close Admin' : 'Open Admin'}
-                </button>
-                {isAdminAuthed && (
+        <>
+          {/* Main Section */}
+          {currentSection === 'main' && (
+            <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+              {/* Admin controls - only show on admin route */}
+              {isAdminRoute && (
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={openAdmin}
+                      className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    >
+                      {isAdminOpen ? 'Close Admin' : 'Open Admin'}
+                    </button>
+                    {isAdminAuthed && (
+                      <button
+                        type="button"
+                        onClick={handleAdminLogout}
+                        className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                      >
+                        Logout
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {isAdminRoute && isAdminOpen && isAdminAuthed && (
+                <AdminPanel books={books} setBooks={setBooks} />
+              )}
+
+              {/* Admin login prompt for admin route */}
+              {isAdminRoute && !isAdminAuthed && (
+                <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
+                  <h3 className="text-lg font-semibold text-amber-800">Admin Access Required</h3>
+                  <p className="text-sm text-amber-700">Please log in to access the admin panel.</p>
                   <button
                     type="button"
-                    onClick={handleAdminLogout}
-                    className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="mt-2 rounded-md bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
                   >
-                    Logout
+                    Login
                   </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {isAdminRoute && isAdminOpen && isAdminAuthed && (
-            <AdminPanel books={books} setBooks={setBooks} />
-          )}
-
-          {/* Admin login prompt for admin route */}
-          {isAdminRoute && !isAdminAuthed && (
-            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
-              <h3 className="text-lg font-semibold text-amber-800">Admin Access Required</h3>
-              <p className="text-sm text-amber-700">Please log in to access the admin panel.</p>
-              <button
-                type="button"
-                onClick={() => setIsAuthModalOpen(true)}
-                className="mt-2 rounded-md bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
-              >
-                Login
-              </button>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-            {/* Books grid */}
-            <section className="lg:col-span-9">
-              <div className="mb-4 flex items-end justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
-                    Featured Books
-                  </h2>
-                  <p className="text-sm text-slate-600">Browse our curated selection</p>
                 </div>
-                <div className="hidden text-sm text-slate-600 lg:block">
-                  {cartItems.length > 0 ? (
-                    <span>
-                      {cartItems.length} item{cartItems.length > 1 ? 's' : ''} in cart •{' '}
-                      {formatCurrencyEGP(totalPrice)}
-                    </span>
+              )}
+
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+                {/* Books grid */}
+                <section className="lg:col-span-9">
+                  <div className="mb-4 flex items-end justify-between">
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
+                        Featured Books
+                      </h2>
+                      <p className="text-sm text-slate-600">Browse our curated selection</p>
+                    </div>
+                    <div className="hidden text-sm text-slate-600 lg:block">
+                      {cartItems.length > 0 ? (
+                        <span>
+                          {cartItems.length} item{cartItems.length > 1 ? 's' : ''} in cart •{' '}
+                          {formatCurrencyEGP(totalPrice)}
+                        </span>
+                      ) : (
+                        <span>Cart is empty</span>
+                      )}
+                    </div>
+                  </div>
+                  {isBooksReady ? (
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+                      {books.slice(0, 8).map((book) => (
+                        <BookCard 
+                          key={book.id} 
+                          book={book} 
+                          onAddToCart={addToCart}
+                          onViewDetails={setSelectedBook}
+                        />
+                      ))}
+                    </div>
                   ) : (
-                    <span>Cart is empty</span>
+                    <div className="py-10 text-center text-sm text-slate-500">Loading…</div>
                   )}
+                  
+                  {/* View All Books Button */}
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={() => handleNavigate('books')}
+                      className="rounded-lg bg-amber-700 px-6 py-3 text-white font-medium hover:bg-amber-600 transition-colors"
+                    >
+                      View All Books
+                    </button>
+                  </div>
+                </section>
+
+                {/* Desktop sidebar */}
+                <div className="lg:col-span-3">
+                  <CartSidebarDesktop
+                    cartItems={cartItems}
+                    onRemoveItem={removeFromCart}
+                    totalPrice={totalPrice}
+                  />
                 </div>
               </div>
+            </main>
+          )}
+
+          {/* Books Section */}
+          {currentSection === 'books' && (
+            <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-slate-900">All Books</h2>
+                <p className="text-slate-600">Browse our complete collection</p>
+              </div>
+              
               {isBooksReady ? (
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                   {books.map((book) => (
                     <BookCard 
                       key={book.id} 
@@ -585,18 +732,14 @@ export default function App() {
               ) : (
                 <div className="py-10 text-center text-sm text-slate-500">Loading…</div>
               )}
-            </section>
+            </main>
+          )}
 
-            {/* Desktop sidebar */}
-            <div className="lg:col-span-3">
-              <CartSidebarDesktop
-                cartItems={cartItems}
-                onRemoveItem={removeFromCart}
-                totalPrice={totalPrice}
-              />
-            </div>
-          </div>
-        </main>
+          {/* Contact Section */}
+          {currentSection === 'contact' && (
+            <ContactSection />
+          )}
+        </>
       )}
 
       {/* Mobile modal */}
