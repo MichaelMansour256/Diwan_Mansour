@@ -669,12 +669,12 @@ export default function App() {
     // Remove from cart
     setCartItems((prev) => prev.filter((ci) => ci.bookId !== bookId));
     
-    // Restore quantity to the book
+    // Restore quantity to the book (add back the quantity that was in cart)
     if (quantityToRestore > 0) {
       setBooks((prevBooks) => 
         prevBooks.map(b => 
           b.id === bookId 
-            ? { ...b, quantity: (b.quantity || 1) + quantityToRestore }
+            ? { ...b, quantity: (b.quantity || 0) + quantityToRestore }
             : b
         )
       );
@@ -702,7 +702,7 @@ export default function App() {
       setBooks((prevBooks) => 
         prevBooks.map(b => 
           b.id === bookId 
-            ? { ...b, quantity: (b.quantity || 1) + 1 }
+            ? { ...b, quantity: (b.quantity || 0) + 1 }
             : b
         )
       );
@@ -1043,7 +1043,7 @@ export default function App() {
 }
 
 function AdminPanel({ books, setBooks }) {
-  const [form, setForm] = useState({ title: '', author: '', price: '', condition: 'new', quantity: 1, availability: 'available' });
+  const [form, setForm] = useState({ title: '', author: '', price: '', condition: 'new', quantity: 1, availability: 'available', originalQuantity: 1 });
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [editingBook, setEditingBook] = useState(null);
 
@@ -1066,15 +1066,16 @@ function AdminPanel({ books, setBooks }) {
       author: book.author,
       price: book.price.toString(),
       condition: book.condition,
-      quantity: book.quantity || 1,
-      availability: book.availability || 'available'
+      quantity: book.totalQuantity || book.quantity || 1, // Use totalQuantity for editing
+      availability: book.availability || 'available',
+      originalQuantity: book.originalQuantity || book.quantity || 1
     });
     setCoverImageFile(null);
   }
 
   function cancelEdit() {
     setEditingBook(null);
-    setForm({ title: '', author: '', price: '', condition: 'new', quantity: 1, availability: 'available' });
+    setForm({ title: '', author: '', price: '', condition: 'new', quantity: 1, availability: 'available', originalQuantity: 1 });
     setCoverImageFile(null);
   }
 
@@ -1139,7 +1140,8 @@ function AdminPanel({ books, setBooks }) {
       price: Math.round(priceNum), 
       imageUrl, 
       condition, 
-      quantity: Math.max(1, Math.round(quantity)),
+      quantity: Math.max(1, Math.round(quantity)), // Available quantity (resets to total when editing)
+      totalQuantity: Math.max(1, Math.round(quantity)), // Total inventory (never changes)
       availability,
       reservedAt: availability === 'reserved' ? Date.now() : null
     };
@@ -1166,7 +1168,7 @@ function AdminPanel({ books, setBooks }) {
       alert('Failed to save book: ' + err.message);
     }
     
-    setForm({ title: '', author: '', price: '', condition: 'new', quantity: 1, availability: 'available' });
+    setForm({ title: '', author: '', price: '', condition: 'new', quantity: 1, availability: 'available', originalQuantity: 1 });
     setCoverImageFile(null);
     setEditingBook(null);
   }
