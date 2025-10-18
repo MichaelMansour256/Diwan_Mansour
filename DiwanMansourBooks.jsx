@@ -9,6 +9,8 @@ const MOCK_BOOKS = [
     price: 320,
     imageUrl: 'https://placehold.co/400x600/14532D/FFFFFF?text=Book+Cover',
     condition: 'new',
+    quantity: 3,
+    totalQuantity: 3,
   },
   {
     id: 'b2',
@@ -17,6 +19,8 @@ const MOCK_BOOKS = [
     price: 450,
     imageUrl: 'https://placehold.co/400x600/1E3A5F/FFFFFF?text=Book+Cover',
     condition: 'used',
+    quantity: 2,
+    totalQuantity: 2,
   },
   {
     id: 'b3',
@@ -25,6 +29,8 @@ const MOCK_BOOKS = [
     price: 380,
     imageUrl: 'https://placehold.co/400x600/0B3D2E/FFFFFF?text=Book+Cover',
     condition: 'new',
+    quantity: 4,
+    totalQuantity: 4,
   },
   {
     id: 'b4',
@@ -33,6 +39,8 @@ const MOCK_BOOKS = [
     price: 550,
     imageUrl: 'https://placehold.co/400x600/253B3D/FFFFFF?text=Book+Cover',
     condition: 'used',
+    quantity: 1,
+    totalQuantity: 1,
   },
   {
     id: 'b5',
@@ -41,6 +49,8 @@ const MOCK_BOOKS = [
     price: 400,
     imageUrl: 'https://placehold.co/400x600/4A3B2A/FFFFFF?text=Book+Cover',
     condition: 'new',
+    quantity: 5,
+    totalQuantity: 5,
   },
   {
     id: 'b6',
@@ -49,6 +59,8 @@ const MOCK_BOOKS = [
     price: 360,
     imageUrl: 'https://placehold.co/400x600/1B4332/FFFFFF?text=Book+Cover',
     condition: 'used',
+    quantity: 2,
+    totalQuantity: 2,
   },
   {
     id: 'b7',
@@ -57,6 +69,8 @@ const MOCK_BOOKS = [
     price: 300,
     imageUrl: 'https://placehold.co/400x600/2C3E50/FFFFFF?text=Book+Cover',
     condition: 'new',
+    quantity: 3,
+    totalQuantity: 3,
   },
   {
     id: 'b8',
@@ -65,6 +79,8 @@ const MOCK_BOOKS = [
     price: 420,
     imageUrl: 'https://placehold.co/400x600/264653/FFFFFF?text=Book+Cover',
     condition: 'used',
+    quantity: 1,
+    totalQuantity: 1,
   },
 ];
 
