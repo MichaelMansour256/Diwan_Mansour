@@ -153,19 +153,31 @@ function BookCard({ book, onAddToCart, onViewDetails }) {
   );
 }
 
-function BookDetail({ book, onAddToCart, onBack }) {
+function BookDetail({ book, onAddToCart, onBack, cartItemsCount }) {
   if (!book) return null;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
-      {/* Back button */}
-      <button
-        onClick={onBack}
-        className="mb-6 inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
-      >
-        <span>←</span>
-        Back to Books
-      </button>
+      {/* Back button and cart indicator */}
+      <div className="mb-6 flex items-center justify-between">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+        >
+          <span>←</span>
+          Back to Books
+        </button>
+        
+        {/* Cart indicator */}
+        {cartItemsCount > 0 && (
+          <div className="flex items-center gap-2 rounded-lg bg-amber-100 px-3 py-2">
+            <span className="text-sm font-medium text-amber-800">Cart:</span>
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-700 text-xs font-bold text-white">
+              {cartItemsCount}
+            </span>
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* Book Image */}
@@ -491,6 +503,7 @@ export default function App() {
           book={selectedBook} 
           onAddToCart={addToCart}
           onBack={() => setSelectedBook(null)}
+          cartItemsCount={cartItemsCount}
         />
       ) : (
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
