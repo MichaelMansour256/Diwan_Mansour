@@ -1101,10 +1101,18 @@ function AdminPanel({ books, setBooks }) {
     const author = form.author.trim();
     const priceNum = Number(form.price);
     const condition = form.condition || 'new';
-    const quantity = Number(form.quantity) || 1;
+    const quantity = Number(form.quantity);
     const availability = form.availability || 'available';
     
+    // Debug logging
+    console.log('Form data:', form);
+    console.log('Parsed quantity:', quantity);
+    
     if (!title || !author || !Number.isFinite(priceNum) || priceNum <= 0) return;
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      alert('Please enter a valid quantity (must be greater than 0)');
+      return;
+    }
     if (!coverImageFile && !editingBook) {
       alert('Please select a cover image');
       return;
@@ -1156,11 +1164,13 @@ function AdminPanel({ books, setBooks }) {
       price: Math.round(priceNum), 
       imageUrl, 
       condition, 
-      quantity: Math.max(1, Math.round(quantity)), // Available quantity (resets to total when editing)
-      totalQuantity: Math.max(1, Math.round(quantity)), // Total inventory (never changes)
+      quantity: Math.round(quantity), // Available quantity (use exact value from form)
+      totalQuantity: Math.round(quantity), // Total inventory (use exact value from form)
       availability,
       reservedAt: availability === 'reserved' ? Date.now() : null
     };
+    
+    console.log('Creating newBook:', newBook);
     
     try {
       if (window.firebaseDb) {
