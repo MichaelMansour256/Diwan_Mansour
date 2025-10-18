@@ -601,7 +601,11 @@ export default function App() {
               author: d.author || '', 
               price: d.price || 0, 
               imageUrl: d.imageUrl || '',
-              condition: d.condition || 'new'
+              condition: d.condition || 'new',
+              quantity: d.quantity || 1,
+              totalQuantity: d.totalQuantity || d.quantity || 1,
+              availability: d.availability || 'available',
+              reservedAt: d.reservedAt || null
             });
           });
           setBooks(remote);
@@ -1181,6 +1185,13 @@ function AdminPanel({ books, setBooks }) {
         };
         await window.firebaseDb.collection('books').doc(id).set(bookData);
         console.log('Book updated successfully in Firebase');
+        
+        // Update local state after successful Firebase update
+        if (editingBook) {
+          setBooks((prev) => prev.map(b => b.id === id ? newBook : b));
+        } else {
+          setBooks((prev) => [newBook, ...prev]);
+        }
       } else {
         console.log('Firebase not available, updating locally');
         if (editingBook) {
