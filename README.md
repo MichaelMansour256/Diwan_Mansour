@@ -89,19 +89,31 @@ createRoot(document.getElementById('root')).render(<App />);
 ```
 
 ## Admin Panel
-- Toggle via the “Open Admin / Close Admin” button near the top of the page.
-- Add: Title, Author, Price (EGP), optional Image URL (falls back to a placeholder).
-- Remove: Click “Remove” next to a listed book.
-- Persistence: Books are saved to `localStorage` under key `dm_books`.
+- **Access**: Click "Open Admin" button (requires Firebase Authentication)
+- **Login**: Email/password authentication via Firebase Auth
+- **Add Books**: Title, Author, Price (EGP), Condition (New/Used), Cover Image Upload
+- **Edit Books**: Click "Edit" button to modify existing books
+- **Image Upload**: Direct file upload via ImgBB API (permanent URLs for all users)
+- **Real-time Sync**: Changes appear instantly for all users via Firebase Firestore
 
 ## WhatsApp Checkout
-- Button: “Checkout via WhatsApp” in cart modal/sidebar.
-- It opens a `wa.me` link with a URL-encoded message listing items and total.
-- Placeholder number: `201001234567` – replace with the real business number when ready.
+- **Button**: "Checkout via WhatsApp" in cart modal/sidebar
+- **Message**: Pre-filled Arabic message with order details
+- **Format**: "اريد طلب الكتب التالية: [items] المجموع: [total] يرجي تأكيد التوفر وإرسال طريقة الدفع"
+- **Phone**: `201201129135` (configured for your business)
 
-## Notes
-- Pricing is formatted as EGP without decimals.
-- Images use placeholder URLs; replace with real covers anytime.
+## Cart Features
+- **Visual Counter**: Red badge showing number of items in cart
+- **Quantity Management**: Add multiple quantities, remove items
+- **Real-time Updates**: Cart updates instantly across all components
+- **Responsive Design**: Mobile modal + desktop sidebar
+
+## Technical Notes
+- **Pricing**: Formatted as EGP without decimals
+- **Images**: Uploaded to ImgBB (permanent URLs, works for all users)
+- **Data Storage**: Firebase Firestore (real-time sync)
+- **Authentication**: Firebase Auth with email/password
+- **Condition Tags**: Visual indicators for New (جديد) vs Used (مستعمل) books
 
 ## License
 Unlicensed / private. Update as needed.
