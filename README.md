@@ -1,13 +1,37 @@
 # Diwan Mansour for Books
 
-A single-file React application styled with Tailwind CSS for a private book catalog with cart and WhatsApp checkout. Includes a minimal Admin panel (localStorage-backed) to add/remove books without a backend.
+<div align="center">
+  <img src="./logo.png" alt="Diwan Mansour Logo" width="100" height="100">
+  <h3>مكتبة إلكترونية لعرض وبيع الكتب</h3>
+  <p>Electronic Library for Book Display and Sales</p>
+</div>
 
-## Features
-- Modern, responsive UI (Tailwind CSS)
-- Book grid with title, author, price, Add to Cart
-- Cart with quantity aggregation, remove item, total price
-- WhatsApp checkout deep link (lists items + total)
-- Admin panel: add/remove books; persists to `localStorage` (`dm_books`)
+A modern, responsive single-file React application for a private book catalog with real-time admin management, cart functionality, and WhatsApp checkout integration.
+
+## ✨ Main Features
+
+### 📚 **Book Management**
+- **New & Used Books** - Visual condition tags (جديد/مستعمل)
+- **Image Upload** - Direct cover image upload via ImgBB API
+- **Real-time Updates** - Firebase Firestore syncs changes instantly
+- **Admin Panel** - Add, edit, and remove books with authentication
+
+### 🛒 **Shopping Experience**
+- **Smart Cart** - Add multiple quantities, remove items
+- **Cart Counter** - Visual indicator showing number of items
+- **Price Display** - EGP currency formatting
+- **Responsive Design** - Works on mobile, tablet, and desktop
+
+### 💬 **WhatsApp Integration**
+- **One-Click Checkout** - Direct WhatsApp message with order details
+- **Arabic Support** - Pre-filled messages in Arabic
+- **Order Summary** - Lists all items, quantities, and total price
+
+### 🔐 **Admin Features**
+- **Secure Login** - Firebase Authentication with email/password
+- **Live Editing** - Edit books without page refresh
+- **Image Management** - Upload new covers or keep existing ones
+- **Real-time Sync** - Changes appear for all users immediately
 
 ## File Structure
 - `DiwanMansourBooks.jsx` – Entire app (components, state, styles via Tailwind classes)
