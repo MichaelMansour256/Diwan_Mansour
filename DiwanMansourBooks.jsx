@@ -107,7 +107,7 @@ function SearchBar({ searchQuery, onSearch, placeholder = "Search books..." }) {
 
 function FloatingNav({ currentSection, onNavigate, searchQuery, onSearch }) {
   return (
-    <nav className="fixed top-4 left-1/2 z-50 -translate-x-1/2 transform">
+    <nav className="fixed top-2 left-1/2 z-50 -translate-x-1/2 transform">
       <div className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/50 shadow-lg px-4 py-2">
         <button
           onClick={() => onNavigate('main')}
