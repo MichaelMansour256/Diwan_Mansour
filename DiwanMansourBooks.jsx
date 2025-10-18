@@ -290,9 +290,14 @@ export default function App() {
   const [books, setBooks] = useState([]);
   const [isBooksReady, setIsBooksReady] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [isAdminRoute, setIsAdminRoute] = useState(false);
 
-  // Load admin auth from localStorage, and subscribe to Firestore books
+  // Check for admin route and load admin auth
   useEffect(() => {
+    // Check if URL contains #admin
+    const isAdminRoute = window.location.hash === '#admin';
+    setIsAdminRoute(isAdminRoute);
+    
     try {
       const authed = localStorage.getItem('dm_admin_authed') === 'true';
       setIsAdminAuthed(authed);
@@ -379,29 +384,47 @@ export default function App() {
       <Header onToggleCart={() => setIsCartOpenOnMobile((v) => !v)} cartItemsCount={cartItemsCount} />
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={openAdmin}
-              className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-            >
-              {isAdminOpen ? 'Close Admin' : 'Open Admin'}
-            </button>
-            {isAdminAuthed && (
+        {/* Admin controls - only show on admin route */}
+        {isAdminRoute && (
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={handleAdminLogout}
-                className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                onClick={openAdmin}
+                className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
               >
-                Logout
+                {isAdminOpen ? 'Close Admin' : 'Open Admin'}
               </button>
-            )}
+              {isAdminAuthed && (
+                <button
+                  type="button"
+                  onClick={handleAdminLogout}
+                  className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                >
+                  Logout
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
-        {isAdminOpen && isAdminAuthed && (
+        {isAdminRoute && isAdminOpen && isAdminAuthed && (
           <AdminPanel books={books} setBooks={setBooks} />
+        )}
+
+        {/* Admin login prompt for admin route */}
+        {isAdminRoute && !isAdminAuthed && (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
+            <h3 className="text-lg font-semibold text-amber-800">Admin Access Required</h3>
+            <p className="text-sm text-amber-700">Please log in to access the admin panel.</p>
+            <button
+              type="button"
+              onClick={() => setIsAuthModalOpen(true)}
+              className="mt-2 rounded-md bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
+            >
+              Login
+            </button>
+          </div>
         )}
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
