@@ -76,10 +76,39 @@ function formatCurrencyEGP(amount) {
   }).format(amount);
 }
 
-function FloatingNav({ currentSection, onNavigate }) {
+function SearchBar({ searchQuery, onSearch, placeholder = "Search books..." }) {
+  return (
+    <div className="relative">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg className="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => onSearch(e.target.value)}
+        placeholder={placeholder}
+        className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-full bg-white/90 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+      />
+      {searchQuery && (
+        <button
+          onClick={() => onSearch('')}
+          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+        >
+          <svg className="h-4 w-4 text-slate-400 hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+}
+
+function FloatingNav({ currentSection, onNavigate, searchQuery, onSearch }) {
   return (
     <nav className="fixed top-4 left-1/2 z-50 -translate-x-1/2 transform">
-      <div className="flex items-center gap-1 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/50 shadow-lg px-4 py-2">
+      <div className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/50 shadow-lg px-4 py-2">
         <button
           onClick={() => onNavigate('main')}
           className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
@@ -110,6 +139,15 @@ function FloatingNav({ currentSection, onNavigate }) {
         >
           Contact Us
         </button>
+        
+        {/* Search Bar */}
+        <div className="w-64">
+          <SearchBar 
+            searchQuery={searchQuery} 
+            onSearch={onSearch}
+            placeholder="Search books..."
+          />
+        </div>
       </div>
     </nav>
   );
@@ -495,6 +533,7 @@ export default function App() {
   const [isAdminRoute, setIsAdminRoute] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
   const [currentSection, setCurrentSection] = useState('main');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Check for admin route and load admin auth
   useEffect(() => {
@@ -583,6 +622,16 @@ export default function App() {
     [cartItems]
   );
 
+  const filteredBooks = useMemo(() => {
+    if (!searchQuery.trim()) return books;
+    
+    const query = searchQuery.toLowerCase().trim();
+    return books.filter(book => 
+      book.title.toLowerCase().includes(query) ||
+      book.author.toLowerCase().includes(query)
+    );
+  }, [books, searchQuery]);
+
   const handleNavigate = (section) => {
     setCurrentSection(section);
     if (section === 'books') {
@@ -590,9 +639,21 @@ export default function App() {
     }
   };
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (query.trim() && currentSection !== 'books') {
+      setCurrentSection('books');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-amber-50 to-orange-50">
-      <FloatingNav currentSection={currentSection} onNavigate={handleNavigate} />
+      <FloatingNav 
+        currentSection={currentSection} 
+        onNavigate={handleNavigate}
+        searchQuery={searchQuery}
+        onSearch={handleSearch}
+      />
       <Header onToggleCart={() => setIsCartOpenOnMobile((v) => !v)} cartItemsCount={cartItemsCount} />
 
       {/* Show book detail page if a book is selected */}
@@ -752,24 +813,58 @@ export default function App() {
           {currentSection === 'books' && (
             <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-slate-900">All Books</h2>
-                <p className="text-slate-600">Browse our complete collection</p>
+                <h2 className="text-2xl font-bold text-slate-900">
+                  {searchQuery ? `Search Results for "${searchQuery}"` : 'All Books'}
+                </h2>
+                <p className="text-slate-600">
+                  {searchQuery 
+                    ? `${filteredBooks.length} book${filteredBooks.length !== 1 ? 's' : ''} found`
+                    : 'Browse our complete collection'
+                  }
+                </p>
               </div>
               
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
                 {/* Books grid */}
                 <section className="lg:col-span-9">
                   {isBooksReady ? (
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
-                      {books.map((book) => (
-                        <BookCard 
-                          key={book.id} 
-                          book={book} 
-                          onAddToCart={addToCart}
-                          onViewDetails={setSelectedBook}
-                        />
-                      ))}
-                    </div>
+                    <>
+                      {filteredBooks.length > 0 ? (
+                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+                          {filteredBooks.map((book) => (
+                            <BookCard 
+                              key={book.id} 
+                              book={book} 
+                              onAddToCart={addToCart}
+                              onViewDetails={setSelectedBook}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="py-16 text-center">
+                          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+                            <svg className="h-8 w-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                          </div>
+                          <h3 className="text-lg font-semibold text-slate-900 mb-2">No books found</h3>
+                          <p className="text-slate-600 mb-4">
+                            {searchQuery 
+                              ? `No books match "${searchQuery}". Try a different search term.`
+                              : 'No books available at the moment.'
+                            }
+                          </p>
+                          {searchQuery && (
+                            <button
+                              onClick={() => handleSearch('')}
+                              className="rounded-lg bg-amber-700 px-4 py-2 text-white font-medium hover:bg-amber-600"
+                            >
+                              Clear Search
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className="py-10 text-center text-sm text-slate-500">Loading…</div>
                   )}
