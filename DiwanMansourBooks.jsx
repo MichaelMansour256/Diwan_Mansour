@@ -122,50 +122,121 @@ function SearchBar({ searchQuery, onSearch, placeholder = "Search books..." }) {
 }
 
 function FloatingNav({ currentSection, onNavigate, searchQuery, onSearch }) {
+  const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+
   return (
-    <nav className="fixed top-2 left-1/2 z-50 -translate-x-1/2 transform">
-      <div className="flex items-center gap-1 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/50 shadow-lg px-2 py-1 sm:px-4 sm:py-2 w-[calc(100vw-1rem)] max-w-[520px]">
-        <button
-          onClick={() => onNavigate('main')}
-          className={`px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-full font-medium transition-colors ${
-            currentSection === 'main' 
-              ? 'bg-amber-700 text-white' 
-              : 'text-slate-700 hover:bg-amber-100'
+    <>
+      {/* Desktop/Tablet nav (previous look) */}
+      <nav className="hidden sm:block fixed top-2 left-1/2 z-50 -translate-x-1/2 transform">
+        <div className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/50 shadow-lg px-4 py-2">
+          <button
+            onClick={() => onNavigate('main')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              currentSection === 'main' 
+                ? 'bg-amber-700 text-white' 
+                : 'text-slate-700 hover:bg-amber-100'
+            }`}
+          >
+            Main
+          </button>
+          <button
+            onClick={() => onNavigate('books')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              currentSection === 'books' 
+                ? 'bg-amber-700 text-white' 
+                : 'text-slate-700 hover:bg-amber-100'
+            }`}
+          >
+            Books
+          </button>
+          <button
+            onClick={() => onNavigate('contact')}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              currentSection === 'contact' 
+                ? 'bg-amber-700 text-white' 
+                : 'text-slate-700 hover:bg-amber-100'
+            }`}
+          >
+            Contact Us
+          </button>
+          <div className="w-64">
+            <SearchBar 
+              searchQuery={searchQuery} 
+              onSearch={onSearch}
+              placeholder="Search books..."
+            />
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile: only magnifier button at top-right */}
+      <button
+        type="button"
+        onClick={() => setIsMobileOpen(true)}
+        className="sm:hidden fixed top-2 right-2 z-50 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/50 p-2 shadow"
+        aria-label="Open navigation"
+      >
+        <svg className="h-5 w-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </button>
+
+      {/* Mobile side menu drawer */}
+      <div className={`sm:hidden fixed inset-0 z-50 ${isMobileOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+        {/* Backdrop */}
+        <div
+          className={`absolute inset-0 bg-black/40 transition-opacity ${isMobileOpen ? 'opacity-100' : 'opacity-0'}`}
+          onClick={() => setIsMobileOpen(false)}
+        />
+        {/* Panel */}
+        <div
+          className={`absolute left-0 top-0 bottom-0 w-72 max-w-[85vw] transform bg-white shadow-xl transition-transform ${
+            isMobileOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          Main
-        </button>
-        <button
-          onClick={() => onNavigate('books')}
-          className={`px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-full font-medium transition-colors ${
-            currentSection === 'books' 
-              ? 'bg-amber-700 text-white' 
-              : 'text-slate-700 hover:bg-amber-100'
-          }`}
-        >
-          Books
-        </button>
-        <button
-          onClick={() => onNavigate('contact')}
-          className={`px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-full font-medium transition-colors ${
-            currentSection === 'contact' 
-              ? 'bg-amber-700 text-white' 
-              : 'text-slate-700 hover:bg-amber-100'
-          }`}
-        >
-          Contact Us
-        </button>
-        
-        {/* Search Bar */}
-        <div className="w-28 sm:w-64">
-          <SearchBar 
-            searchQuery={searchQuery} 
-            onSearch={onSearch}
-            placeholder="Search books..."
-          />
+          <div className="flex items-center justify-between border-b border-slate-200 p-4">
+            <h3 className="text-sm font-semibold text-slate-900">Menu</h3>
+            <button
+              type="button"
+              onClick={() => setIsMobileOpen(false)}
+              className="rounded-md bg-slate-100 p-2 text-slate-700 hover:bg-slate-200"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="p-4 space-y-4">
+            <SearchBar searchQuery={searchQuery} onSearch={onSearch} placeholder="Search books..." />
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => { onNavigate('main'); setIsMobileOpen(false); }}
+                className={`w-full rounded-md px-3 py-2 text-left text-sm font-medium ${
+                  currentSection === 'main' ? 'bg-amber-700 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                Main
+              </button>
+              <button
+                onClick={() => { onNavigate('books'); setIsMobileOpen(false); }}
+                className={`w-full rounded-md px-3 py-2 text-left text-sm font-medium ${
+                  currentSection === 'books' ? 'bg-amber-700 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                Books
+              </button>
+              <button
+                onClick={() => { onNavigate('contact'); setIsMobileOpen(false); }}
+                className={`w-full rounded-md px-3 py-2 text-left text-sm font-medium ${
+                  currentSection === 'contact' ? 'bg-amber-700 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                Contact Us
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </nav>
+    </>
   );
 }
 
