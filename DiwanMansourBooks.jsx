@@ -105,7 +105,7 @@ function SearchBar({ searchQuery, onSearch, placeholder = "Search books..." }) {
         value={searchQuery}
         onChange={(e) => onSearch(e.target.value)}
         placeholder={placeholder}
-        className="w-full pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-full bg-white/90 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+        className="w-full pl-8 pr-3 py-1.5 text-xs sm:pl-10 sm:pr-4 sm:py-2 sm:text-sm border border-slate-300 rounded-full bg-white/90 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
       />
       {searchQuery && (
         <button
@@ -124,10 +124,10 @@ function SearchBar({ searchQuery, onSearch, placeholder = "Search books..." }) {
 function FloatingNav({ currentSection, onNavigate, searchQuery, onSearch }) {
   return (
     <nav className="fixed top-2 left-1/2 z-50 -translate-x-1/2 transform">
-      <div className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/50 shadow-lg px-4 py-2">
+      <div className="flex items-center gap-1 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/50 shadow-lg px-2 py-1 sm:px-4 sm:py-2 w-[calc(100vw-1rem)] max-w-[520px]">
         <button
           onClick={() => onNavigate('main')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-full font-medium transition-colors ${
             currentSection === 'main' 
               ? 'bg-amber-700 text-white' 
               : 'text-slate-700 hover:bg-amber-100'
@@ -137,7 +137,7 @@ function FloatingNav({ currentSection, onNavigate, searchQuery, onSearch }) {
         </button>
         <button
           onClick={() => onNavigate('books')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-full font-medium transition-colors ${
             currentSection === 'books' 
               ? 'bg-amber-700 text-white' 
               : 'text-slate-700 hover:bg-amber-100'
@@ -147,7 +147,7 @@ function FloatingNav({ currentSection, onNavigate, searchQuery, onSearch }) {
         </button>
         <button
           onClick={() => onNavigate('contact')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm rounded-full font-medium transition-colors ${
             currentSection === 'contact' 
               ? 'bg-amber-700 text-white' 
               : 'text-slate-700 hover:bg-amber-100'
@@ -157,7 +157,7 @@ function FloatingNav({ currentSection, onNavigate, searchQuery, onSearch }) {
         </button>
         
         {/* Search Bar */}
-        <div className="w-64">
+        <div className="w-28 sm:w-64">
           <SearchBar 
             searchQuery={searchQuery} 
             onSearch={onSearch}
