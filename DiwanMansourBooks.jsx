@@ -295,7 +295,8 @@ function Header({ onToggleCart, cartItemsCount }) {
   return (
     <header className="sticky top-0 z-30 w-full border-b border-amber-900/20 bg-amber-800 text-amber-50">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3">
+        {/* Desktop: Full logo + text */}
+        <div className="hidden sm:flex items-center gap-3">
           <img src="./logo.png" alt="Diwan Mansour logo" className="h-10 w-10 rounded-md ring-1 ring-amber-600/40 object-contain bg-white" />
           <div>
             <h1 className="text-lg font-semibold tracking-tight sm:text-xl">
@@ -304,6 +305,12 @@ function Header({ onToggleCart, cartItemsCount }) {
             <p className="text-xs text-amber-100/90 sm:text-sm">مكتبة إلكترونية لعرض وبيع الكتب</p>
           </div>
         </div>
+        
+        {/* Mobile: Centered logo only */}
+        <div className="sm:hidden flex justify-center flex-1">
+          <img src="./logo.png" alt="Diwan Mansour logo" className="h-8 w-8 rounded-md ring-1 ring-amber-600/40 object-contain bg-white" />
+        </div>
+        
         <div className="flex items-center gap-2">
           <button
             type="button"
