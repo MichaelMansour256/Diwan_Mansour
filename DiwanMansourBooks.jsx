@@ -308,7 +308,7 @@ function Header({ onToggleCart, cartItemsCount }) {
         
         {/* Mobile: Centered logo only */}
         <div className="sm:hidden flex justify-center flex-1">
-          <img src="./logo.png" alt="Diwan Mansour logo" className="h-8 w-8 rounded-md ring-1 ring-amber-600/40 object-contain bg-white" />
+          <img src="./logo.png" alt="Diwan Mansour logo" className="h-12 w-12 rounded-md ring-1 ring-amber-600/40 object-contain bg-white" />
         </div>
         
         <div className="flex items-center gap-2">
