@@ -735,12 +735,19 @@ export default function App() {
       return;
     }
     
-    // Check if we're trying to add more copies than available
-    const availableQuantity = book.quantity || 1;
+    // Use remaining stock for gating
+    const remaining = Number(book.quantity) || 0;
     const currentCartQuantity = cartItems.find(ci => ci.bookId === book.id)?.quantity || 0;
-    
-    if (currentCartQuantity >= availableQuantity) {
-      alert(`Sorry, only ${availableQuantity} copy(ies) available for "${book.title}"`);
+    const maxAllowed = Number(book.totalQuantity) || null;
+
+    // If we track a total cap, respect it; otherwise rely on remaining stock
+    if (maxAllowed !== null && currentCartQuantity >= maxAllowed) {
+      alert(`Sorry, you have reached the maximum available copies (${maxAllowed}) for "${book.title}"`);
+      return;
+    }
+
+    if (remaining <= 0) {
+      alert(`Sorry, no more copies available for "${book.title}"`);
       return;
     }
     
@@ -761,7 +768,7 @@ export default function App() {
     setBooks((prevBooks) => 
       prevBooks.map(b => 
         b.id === book.id 
-          ? { ...b, quantity: Math.max(0, (b.quantity || 1) - 1) }
+          ? { ...b, quantity: Math.max(0, (b.quantity || 0) - 1) }
           : b
       )
     );
