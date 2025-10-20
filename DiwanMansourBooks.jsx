@@ -530,7 +530,7 @@ function WhatsAppCheckoutButton({ cartItems, totalPrice }) {
   );
 }
 
-function CartList({ cartItems, onRemoveItem, onReduceQuantity, totalPrice }) {
+function CartList({ cartItems, onRemoveItem, onReduceQuantity, onIncreaseQuantity, totalPrice }) {
   return (
     <div className="flex h-full flex-col">
       {cartItems.length === 0 ? (
@@ -554,6 +554,13 @@ function CartList({ cartItems, onRemoveItem, onReduceQuantity, totalPrice }) {
                     <span className="min-w-[20px] text-center text-xs font-medium text-slate-900">
                       {item.quantity}
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => onIncreaseQuantity(item.bookId)}
+                      className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-700 hover:bg-slate-200"
+                    >
+                      +
+                    </button>
                     <button
                       type="button"
                       onClick={() => onRemoveItem(item.bookId)}
@@ -583,7 +590,7 @@ function CartList({ cartItems, onRemoveItem, onReduceQuantity, totalPrice }) {
   );
 }
 
-function CartSidebarDesktop({ cartItems, onRemoveItem, onReduceQuantity, totalPrice }) {
+function CartSidebarDesktop({ cartItems, onRemoveItem, onReduceQuantity, onIncreaseQuantity, totalPrice }) {
   const cartItemsCount = cartItems.reduce((sum, ci) => sum + ci.quantity, 0);
   
   return (
@@ -597,14 +604,14 @@ function CartSidebarDesktop({ cartItems, onRemoveItem, onReduceQuantity, totalPr
             </span>
           )}
         </div>
-        <CartList cartItems={cartItems} onRemoveItem={onRemoveItem} onReduceQuantity={onReduceQuantity} totalPrice={totalPrice} />
+        <CartList cartItems={cartItems} onRemoveItem={onRemoveItem} onReduceQuantity={onReduceQuantity} onIncreaseQuantity={onIncreaseQuantity} totalPrice={totalPrice} />
         <WhatsAppCheckoutButton cartItems={cartItems} totalPrice={totalPrice} />
       </div>
     </aside>
   );
 }
 
-function CartModalMobile({ isOpen, onClose, cartItems, onRemoveItem, onReduceQuantity, totalPrice }) {
+function CartModalMobile({ isOpen, onClose, cartItems, onRemoveItem, onReduceQuantity, onIncreaseQuantity, totalPrice }) {
   return (
     <div
       className={`lg:hidden ${
@@ -632,7 +639,7 @@ function CartModalMobile({ isOpen, onClose, cartItems, onRemoveItem, onReduceQua
             </button>
           </div>
           <div className="flex h-[calc(70vh-3rem)] flex-col">
-            <CartList cartItems={cartItems} onRemoveItem={onRemoveItem} onReduceQuantity={onReduceQuantity} totalPrice={totalPrice} />
+            <CartList cartItems={cartItems} onRemoveItem={onRemoveItem} onReduceQuantity={onReduceQuantity} onIncreaseQuantity={onIncreaseQuantity} totalPrice={totalPrice} />
             <WhatsAppCheckoutButton cartItems={cartItems} totalPrice={totalPrice} />
           </div>
         </div>
@@ -806,6 +813,21 @@ export default function App() {
         )
       );
     }
+  }
+
+  function increaseCartQuantity(bookId) {
+    // find book in catalog
+    const book = books.find(b => b.id === bookId);
+    if (!book) return;
+    const available = book.quantity || 0;
+    if (available <= 0) {
+      alert('No more stock available for this title');
+      return;
+    }
+    // increment in cart
+    setCartItems(prev => prev.map(ci => ci.bookId === bookId ? { ...ci, quantity: ci.quantity + 1 } : ci));
+    // decrement from stock
+    setBooks(prev => prev.map(b => b.id === bookId ? { ...b, quantity: Math.max(0, (b.quantity || 0) - 1) } : b));
   }
 
   const totalPrice = useMemo(
@@ -1102,6 +1124,7 @@ export default function App() {
                     cartItems={cartItems}
                     onRemoveItem={removeFromCart}
                     onReduceQuantity={reduceCartQuantity}
+                    onIncreaseQuantity={increaseCartQuantity}
                     totalPrice={totalPrice}
                   />
                 </div>
@@ -1123,6 +1146,7 @@ export default function App() {
         cartItems={cartItems}
         onRemoveItem={removeFromCart}
         onReduceQuantity={reduceCartQuantity}
+        onIncreaseQuantity={increaseCartQuantity}
         totalPrice={totalPrice}
       />
 
