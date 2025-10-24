@@ -33,7 +33,7 @@ const MOCK_BOOKS = [
     condition: 'new',
     quantity: 4,
     totalQuantity: 4,
-    availability: 'reserved',
+    availability: 'available',
   },
   {
     id: 'b4',
@@ -55,7 +55,7 @@ const MOCK_BOOKS = [
     condition: 'new',
     quantity: 5,
     totalQuantity: 5,
-    availability: 'sold',
+    availability: 'unavailable',
   },
   {
     id: 'b6',
@@ -360,30 +360,16 @@ function BookCard({ book, onAddToCart, onViewDetails }) {
             {book.condition === 'new' ? 'جديد' : 'مستعمل'}
           </span>
         </div>
-        {/* Quantity tag */}
+        {/* Status/Quantity tag */}
         <div className="absolute top-2 right-2">
           <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-            (book.quantity || 1) > 0
+            book.availability === 'available' && (book.quantity || 1) > 0
               ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-600/20' 
               : 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
           }`}>
-            {(book.quantity || 1) > 0 ? `${book.quantity || 1} متوفر` : 'نفذ'}
-          </span>
-        </div>
-        {/* Availability status tag */}
-        <div className="absolute bottom-2 left-2">
-          <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-            book.availability === 'available' 
-              ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20'
-              : book.availability === 'reserved'
-              ? 'bg-yellow-100 text-yellow-800 ring-1 ring-yellow-600/20'
-              : book.availability === 'sold'
-              ? 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
-              : 'bg-gray-100 text-gray-800 ring-1 ring-gray-600/20'
-          }`}>
-            {book.availability === 'available' ? 'متوفر' :
-             book.availability === 'reserved' ? 'محجوز' :
-             book.availability === 'sold' ? 'مباع' : 'غير متوفر'}
+            {book.availability === 'available' && (book.quantity || 1) > 0 
+              ? `${book.quantity || 1} متوفر` 
+              : 'غير متوفر'}
           </span>
         </div>
       </div>
@@ -454,20 +440,16 @@ function BookDetail({ book, onAddToCart, onBack, cartItemsCount }) {
                 {book.condition === 'new' ? 'جديد' : 'مستعمل'}
               </span>
             </div>
-            {/* Availability status tag */}
+            {/* Status/Quantity tag */}
             <div className="absolute top-4 right-4">
               <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
-                book.availability === 'available' 
-                  ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20'
-                  : book.availability === 'reserved'
-                  ? 'bg-yellow-100 text-yellow-800 ring-1 ring-yellow-600/20'
-                  : book.availability === 'sold'
-                  ? 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
-                  : 'bg-gray-100 text-gray-800 ring-1 ring-gray-600/20'
+                book.availability === 'available' && (book.quantity || 1) > 0
+                  ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-600/20' 
+                  : 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
               }`}>
-                {book.availability === 'available' ? 'متوفر' :
-                 book.availability === 'reserved' ? 'محجوز' :
-                 book.availability === 'sold' ? 'مباع' : 'غير متوفر'}
+                {book.availability === 'available' && (book.quantity || 1) > 0 
+                  ? `${book.quantity || 1} متوفر` 
+                  : 'غير متوفر'}
               </span>
             </div>
           </div>
@@ -1444,8 +1426,6 @@ function AdminPanel({ books, setBooks }) {
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
         >
           <option value="available">متوفر (Available)</option>
-          <option value="reserved">محجوز (Reserved)</option>
-          <option value="sold">مباع (Sold)</option>
           <option value="unavailable">غير متوفر (Unavailable)</option>
         </select>
         <div className="flex flex-col gap-2">
