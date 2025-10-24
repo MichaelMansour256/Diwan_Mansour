@@ -1190,6 +1190,7 @@ function AdminPanel({ books, setBooks }) {
   }
 
   function startEdit(book) {
+    console.log('Starting edit for book:', book);
     setEditingBook(book);
     setForm({
       title: book.title,
@@ -1197,6 +1198,15 @@ function AdminPanel({ books, setBooks }) {
       price: book.price.toString(),
       condition: book.condition,
       quantity: book.totalQuantity || book.quantity || 1, // Use totalQuantity for editing
+      availability: book.availability || 'available',
+      originalQuantity: book.originalQuantity || book.quantity || 1
+    });
+    console.log('Form set to:', {
+      title: book.title,
+      author: book.author,
+      price: book.price.toString(),
+      condition: book.condition,
+      quantity: book.totalQuantity || book.quantity || 1,
       availability: book.availability || 'available',
       originalQuantity: book.originalQuantity || book.quantity || 1
     });
@@ -1221,6 +1231,7 @@ function AdminPanel({ books, setBooks }) {
     // Debug logging
     console.log('Form data:', form);
     console.log('Parsed quantity:', quantity);
+    console.log('Parsed availability:', availability);
     
     if (!title || !author || !Number.isFinite(priceNum) || priceNum <= 0) return;
     if (!Number.isFinite(quantity) || quantity <= 0) {
@@ -1285,6 +1296,7 @@ function AdminPanel({ books, setBooks }) {
     };
     
     console.log('Creating newBook:', newBook);
+    console.log('Availability in newBook:', newBook.availability);
     
     try {
       if (window.firebaseDb) {
