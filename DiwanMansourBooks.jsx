@@ -370,6 +370,22 @@ function BookCard({ book, onAddToCart, onViewDetails }) {
             {(book.quantity || 1) > 0 ? `${book.quantity || 1} متوفر` : 'نفذ'}
           </span>
         </div>
+        {/* Availability status tag */}
+        <div className="absolute bottom-2 left-2">
+          <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+            book.availability === 'available' 
+              ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20'
+              : book.availability === 'reserved'
+              ? 'bg-yellow-100 text-yellow-800 ring-1 ring-yellow-600/20'
+              : book.availability === 'sold'
+              ? 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
+              : 'bg-gray-100 text-gray-800 ring-1 ring-gray-600/20'
+          }`}>
+            {book.availability === 'available' ? 'متوفر' :
+             book.availability === 'reserved' ? 'محجوز' :
+             book.availability === 'sold' ? 'مباع' : 'غير متوفر'}
+          </span>
+        </div>
       </div>
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-3">
@@ -436,6 +452,22 @@ function BookDetail({ book, onAddToCart, onBack, cartItemsCount }) {
                   : 'bg-orange-100 text-orange-800 ring-1 ring-orange-600/20'
               }`}>
                 {book.condition === 'new' ? 'جديد' : 'مستعمل'}
+              </span>
+            </div>
+            {/* Availability status tag */}
+            <div className="absolute top-4 right-4">
+              <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+                book.availability === 'available' 
+                  ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20'
+                  : book.availability === 'reserved'
+                  ? 'bg-yellow-100 text-yellow-800 ring-1 ring-yellow-600/20'
+                  : book.availability === 'sold'
+                  ? 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
+                  : 'bg-gray-100 text-gray-800 ring-1 ring-gray-600/20'
+              }`}>
+                {book.availability === 'available' ? 'متوفر' :
+                 book.availability === 'reserved' ? 'محجوز' :
+                 book.availability === 'sold' ? 'مباع' : 'غير متوفر'}
               </span>
             </div>
           </div>
