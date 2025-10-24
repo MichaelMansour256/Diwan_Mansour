@@ -11,6 +11,7 @@ const MOCK_BOOKS = [
     condition: 'new',
     quantity: 3,
     totalQuantity: 3,
+    availability: 'available',
   },
   {
     id: 'b2',
@@ -21,6 +22,7 @@ const MOCK_BOOKS = [
     condition: 'used',
     quantity: 2,
     totalQuantity: 2,
+    availability: 'available',
   },
   {
     id: 'b3',
@@ -31,6 +33,7 @@ const MOCK_BOOKS = [
     condition: 'new',
     quantity: 4,
     totalQuantity: 4,
+    availability: 'reserved',
   },
   {
     id: 'b4',
@@ -41,6 +44,7 @@ const MOCK_BOOKS = [
     condition: 'used',
     quantity: 1,
     totalQuantity: 1,
+    availability: 'available',
   },
   {
     id: 'b5',
@@ -51,6 +55,7 @@ const MOCK_BOOKS = [
     condition: 'new',
     quantity: 5,
     totalQuantity: 5,
+    availability: 'sold',
   },
   {
     id: 'b6',
@@ -61,6 +66,7 @@ const MOCK_BOOKS = [
     condition: 'used',
     quantity: 2,
     totalQuantity: 2,
+    availability: 'available',
   },
   {
     id: 'b7',
@@ -71,6 +77,7 @@ const MOCK_BOOKS = [
     condition: 'new',
     quantity: 3,
     totalQuantity: 3,
+    availability: 'unavailable',
   },
   {
     id: 'b8',
@@ -81,6 +88,7 @@ const MOCK_BOOKS = [
     condition: 'used',
     quantity: 1,
     totalQuantity: 1,
+    availability: 'available',
   },
 ];
 
