@@ -100,10 +100,10 @@ function formatCurrencyEGP(amount) {
   }).format(amount);
 }
 
-function SearchBar({ searchQuery, onSearch, placeholder = "Search books..." }) {
+function SearchBar({ searchQuery, onSearch, placeholder = "ابحث عن الكتب..." }) {
   return (
     <div className="relative">
-      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
         <svg className="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
@@ -113,12 +113,12 @@ function SearchBar({ searchQuery, onSearch, placeholder = "Search books..." }) {
         value={searchQuery}
         onChange={(e) => onSearch(e.target.value)}
         placeholder={placeholder}
-        className="w-full pl-8 pr-3 py-1.5 text-xs sm:pl-10 sm:pr-4 sm:py-2 sm:text-sm border border-slate-300 rounded-full bg-white/90 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+        className="w-full pr-8 pl-3 py-1.5 text-xs sm:pr-10 sm:pl-4 sm:py-2 sm:text-sm border border-slate-300 rounded-full bg-white/90 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
       />
       {searchQuery && (
         <button
           onClick={() => onSearch('')}
-          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+          className="absolute inset-y-0 left-0 pl-3 flex items-center"
         >
           <svg className="h-4 w-4 text-slate-400 hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -145,7 +145,7 @@ function FloatingNav({ currentSection, onNavigate, searchQuery, onSearch }) {
                 : 'text-slate-700 hover:bg-amber-100'
             }`}
           >
-            Main
+            الرئيسية
           </button>
           <button
             onClick={() => onNavigate('books')}
@@ -155,7 +155,7 @@ function FloatingNav({ currentSection, onNavigate, searchQuery, onSearch }) {
                 : 'text-slate-700 hover:bg-amber-100'
             }`}
           >
-            Books
+            الكتب
           </button>
           <button
             onClick={() => onNavigate('contact')}
@@ -165,13 +165,13 @@ function FloatingNav({ currentSection, onNavigate, searchQuery, onSearch }) {
                 : 'text-slate-700 hover:bg-amber-100'
             }`}
           >
-            Contact Us
+            اتصل بنا
           </button>
           <div className="w-64">
             <SearchBar 
               searchQuery={searchQuery} 
               onSearch={onSearch}
-              placeholder="Search books..."
+              placeholder="ابحث عن الكتب..."
             />
           </div>
         </div>
@@ -204,42 +204,42 @@ function FloatingNav({ currentSection, onNavigate, searchQuery, onSearch }) {
           }`}
         >
           <div className="flex items-center justify-between border-b border-slate-200 p-4">
-            <h3 className="text-sm font-semibold text-slate-900">Menu</h3>
+            <h3 className="text-sm font-semibold text-slate-900">القائمة</h3>
             <button
               type="button"
               onClick={() => setIsMobileOpen(false)}
               className="rounded-md bg-slate-100 p-2 text-slate-700 hover:bg-slate-200"
-              aria-label="Close"
+              aria-label="إغلاق"
             >
               ✕
             </button>
           </div>
           <div className="p-4 space-y-4">
-            <SearchBar searchQuery={searchQuery} onSearch={onSearch} placeholder="Search books..." />
+            <SearchBar searchQuery={searchQuery} onSearch={onSearch} placeholder="ابحث عن الكتب..." />
             <div className="flex flex-col gap-2">
               <button
                 onClick={() => { onNavigate('main'); setIsMobileOpen(false); }}
-                className={`w-full rounded-md px-3 py-2 text-left text-sm font-medium ${
+                className={`w-full rounded-md px-3 py-2 text-right text-sm font-medium ${
                   currentSection === 'main' ? 'bg-amber-700 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                Main
+                الرئيسية
               </button>
               <button
                 onClick={() => { onNavigate('books'); setIsMobileOpen(false); }}
-                className={`w-full rounded-md px-3 py-2 text-left text-sm font-medium ${
+                className={`w-full rounded-md px-3 py-2 text-right text-sm font-medium ${
                   currentSection === 'books' ? 'bg-amber-700 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                Books
+                الكتب
               </button>
               <button
                 onClick={() => { onNavigate('contact'); setIsMobileOpen(false); }}
-                className={`w-full rounded-md px-3 py-2 text-left text-sm font-medium ${
+                className={`w-full rounded-md px-3 py-2 text-right text-sm font-medium ${
                   currentSection === 'contact' ? 'bg-amber-700 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                Contact Us
+                اتصل بنا
               </button>
             </div>
           </div>
@@ -254,14 +254,14 @@ function ContactSection() {
     <section id="contact" className="py-16 bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-slate-900">Contact Us</h2>
-          <p className="mt-4 text-lg text-slate-600">Get in touch with Diwan Mansour for Books</p>
+          <h2 className="text-3xl font-bold text-slate-900">اتصل بنا</h2>
+          <p className="mt-4 text-lg text-slate-600">تواصل مع ديوان منصور للكتب</p>
         </div>
         
         <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
           <div className="rounded-xl bg-amber-50 p-8">
-            <h3 className="text-xl font-semibold text-amber-800 mb-4">📞 WhatsApp</h3>
-            <p className="text-slate-700 mb-4">Contact us directly via WhatsApp for quick responses and orders.</p>
+            <h3 className="text-xl font-semibold text-amber-800 mb-4">📞 واتساب</h3>
+            <p className="text-slate-700 mb-4">تواصل معنا مباشرة عبر واتساب للرد السريع والطلبات.</p>
             <a 
               href="https://wa.me/201201129135" 
               target="_blank" 
@@ -269,29 +269,29 @@ function ContactSection() {
               className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-white font-medium hover:bg-green-700 transition-colors"
             >
               <span>📱</span>
-              Chat on WhatsApp
+              محادثة على واتساب
             </a>
           </div>
           
           <div className="rounded-xl bg-slate-50 p-8">
-            <h3 className="text-xl font-semibold text-slate-800 mb-4">📧 Email</h3>
-            <p className="text-slate-700 mb-4">Send us an email for inquiries about book availability and orders.</p>
+            <h3 className="text-xl font-semibold text-slate-800 mb-4">📧 البريد الإلكتروني</h3>
+            <p className="text-slate-700 mb-4">أرسل لنا بريدًا إلكترونيًا للاستفسار عن توفر الكتب والطلبات.</p>
             <a 
               href="mailto:info@diwanmansour.com" 
               className="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-6 py-3 text-white font-medium hover:bg-slate-800 transition-colors"
             >
               <span>✉️</span>
-              Send Email
+              إرسال بريد إلكتروني
             </a>
           </div>
         </div>
         
         <div className="mt-12 text-center">
           <div className="rounded-xl bg-gradient-to-r from-amber-100 to-orange-100 p-8">
-            <h3 className="text-xl font-semibold text-amber-800 mb-4">🕒 Business Hours</h3>
-            <p className="text-slate-700">Monday - Friday: 9:00 AM - 6:00 PM</p>
-            <p className="text-slate-700">Saturday: 10:00 AM - 4:00 PM</p>
-            <p className="text-slate-600 mt-2">Sunday: Closed</p>
+            <h3 className="text-xl font-semibold text-amber-800 mb-4">🕒 ساعات العمل</h3>
+            <p className="text-slate-700">السبت - الخميس: 9:00 صباحاً - 6:00 مساءً</p>
+            <p className="text-slate-700">الجمعة: 10:00 صباحاً - 4:00 مساءً</p>
+            <p className="text-slate-600 mt-2">متاح على واتساب 24/7</p>
           </div>
         </div>
       </div>
@@ -324,9 +324,9 @@ function Header({ onToggleCart, cartItemsCount }) {
             type="button"
             onClick={onToggleCart}
             className="relative inline-flex items-center gap-2 rounded-md bg-amber-700 px-3 py-2 text-sm font-medium text-amber-50 shadow hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 lg:hidden"
-            aria-label="Toggle cart"
+            aria-label="فتح السلة"
           >
-            <span>Cart</span>
+            <span>السلة</span>
             <span>🛒</span>
             {cartItemsCount > 0 && (
               <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
@@ -387,7 +387,7 @@ function BookCard({ book, onAddToCart, onViewDetails }) {
             onClick={() => onAddToCart(book)}
             className="rounded-md bg-amber-700 px-3 py-2 text-xs font-medium text-white shadow hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400"
           >
-            Add to Cart
+            أضف للسلة
           </button>
         </div>
       </div>
@@ -406,14 +406,14 @@ function BookDetail({ book, onAddToCart, onBack, cartItemsCount }) {
           onClick={onBack}
           className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
         >
-          <span>←</span>
-          Back to Books
+          <span>→</span>
+          العودة للكتب
         </button>
         
         {/* Cart indicator */}
         {cartItemsCount > 0 && (
           <div className="flex items-center gap-2 rounded-lg bg-amber-100 px-3 py-2">
-            <span className="text-sm font-medium text-amber-800">Cart:</span>
+            <span className="text-sm font-medium text-amber-800">السلة:</span>
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-700 text-xs font-bold text-white">
               {cartItemsCount}
             </span>
@@ -459,7 +459,7 @@ function BookDetail({ book, onAddToCart, onBack, cartItemsCount }) {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">{book.title}</h1>
-            <p className="mt-2 text-xl text-slate-600">by {book.author}</p>
+            <p className="mt-2 text-xl text-slate-600">بواسطة {book.author}</p>
           </div>
 
           <div className="space-y-4">
@@ -472,27 +472,27 @@ function BookDetail({ book, onAddToCart, onBack, cartItemsCount }) {
                   ? 'bg-green-100 text-green-800' 
                   : 'bg-orange-100 text-orange-800'
               }`}>
-                {book.condition === 'new' ? 'New Book' : 'Used Book'}
+                {book.condition === 'new' ? 'كتاب جديد' : 'كتاب مستعمل'}
               </span>
             </div>
 
             <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-slate-900">Book Information</h3>
+              <h3 className="text-lg font-semibold text-slate-900">معلومات الكتاب</h3>
               <div className="space-y-2 text-sm text-slate-600">
                 <div className="flex justify-between">
-                  <span>Title:</span>
+                  <span>العنوان:</span>
                   <span className="font-medium">{book.title}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Author:</span>
+                  <span>المؤلف:</span>
                   <span className="font-medium">{book.author}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Condition:</span>
-                  <span className="font-medium">{book.condition === 'new' ? 'New' : 'Used'}</span>
+                  <span>الحالة:</span>
+                  <span className="font-medium">{book.condition === 'new' ? 'جديد' : 'مستعمل'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Price:</span>
+                  <span>السعر:</span>
                   <span className="font-medium text-green-800">{formatCurrencyEGP(book.price)}</span>
                 </div>
               </div>
@@ -503,14 +503,14 @@ function BookDetail({ book, onAddToCart, onBack, cartItemsCount }) {
                 onClick={() => onAddToCart(book)}
                 className="w-full rounded-lg bg-amber-700 px-6 py-3 text-lg font-semibold text-white shadow hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400"
               >
-                Add to Cart
+                أضف للسلة
               </button>
             </div>
 
             <div className="rounded-lg bg-amber-50 p-4">
-              <h4 className="font-semibold text-amber-800">📞 Contact Information</h4>
+              <h4 className="font-semibold text-amber-800">📞 معلومات الاتصال</h4>
               <p className="mt-2 text-sm text-amber-700">
-                For questions about this book or to place an order, please contact us via WhatsApp.
+                للاستفسار عن هذا الكتاب أو لتقديم طلب، يرجى التواصل معنا عبر واتساب.
               </p>
             </div>
           </div>
@@ -546,7 +546,7 @@ function WhatsAppCheckoutButton({ cartItems, totalPrice }) {
           : 'bg-amber-700 text-white hover:bg-amber-600'
       }`}
     >
-      <span>Checkout via WhatsApp</span>
+      <span>الدفع عبر واتساب</span>
       <span>📲</span>
     </button>
   );
@@ -556,7 +556,7 @@ function CartList({ cartItems, onRemoveItem, onReduceQuantity, onIncreaseQuantit
   return (
     <div className="flex h-full flex-col">
       {cartItems.length === 0 ? (
-        <p className="text-sm text-slate-600">Your cart is empty.</p>
+        <p className="text-sm text-slate-600">السلة فارغة.</p>
       ) : (
         <ul className="-mx-2 flex-1 space-y-3 overflow-y-auto px-2">
           {cartItems.map((item) => (
@@ -564,7 +564,7 @@ function CartList({ cartItems, onRemoveItem, onReduceQuantity, onIncreaseQuantit
               <div className="flex-1">
                 <p className="text-sm font-medium text-slate-900">{item.title}</p>
                 <div className="mt-1 flex items-center gap-2">
-                  <span className="text-xs text-slate-600">Qty:</span>
+                  <span className="text-xs text-slate-600">الكمية:</span>
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
@@ -604,7 +604,7 @@ function CartList({ cartItems, onRemoveItem, onReduceQuantity, onIncreaseQuantit
       )}
       <div className="mt-4 border-t border-slate-200 pt-4">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-slate-700">Total</span>
+          <span className="text-sm font-medium text-slate-700">المجموع</span>
           <span className="text-base font-semibold text-green-800">{formatCurrencyEGP(totalPrice)}</span>
         </div>
       </div>
@@ -619,7 +619,7 @@ function CartSidebarDesktop({ cartItems, onRemoveItem, onReduceQuantity, onIncre
     <aside className="hidden lg:sticky lg:top-[88px] lg:block lg:h-[calc(100vh-96px)] lg:w-80">
       <div className="flex h-full flex-col rounded-xl border border-amber-900/10 bg-white p-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-slate-900">Your Cart</h3>
+          <h3 className="text-base font-semibold text-slate-900">سلة التسوق</h3>
           {cartItemsCount > 0 && (
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
               {cartItemsCount}
@@ -651,13 +651,13 @@ function CartModalMobile({ isOpen, onClose, cartItems, onRemoveItem, onReduceQua
       >
         <div className="mx-auto h-[70vh] max-w-2xl">
           <div className="mb-2 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-slate-900">Your Cart</h3>
+            <h3 className="text-base font-semibold text-slate-900">سلة التسوق</h3>
             <button
               type="button"
               onClick={onClose}
               className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
             >
-              Close
+              إغلاق
             </button>
           </div>
           <div className="flex h-[calc(70vh-3rem)] flex-col">
@@ -749,11 +749,11 @@ export default function App() {
     // Check if book is available
     if (book.availability && book.availability !== 'available') {
       const statusMessages = {
-        'reserved': 'This book is currently reserved by another customer',
-        'sold': 'This book has been sold',
-        'unavailable': 'This book is currently unavailable'
+        'reserved': 'هذا الكتاب محجوز حالياً من قبل عميل آخر',
+        'sold': 'تم بيع هذا الكتاب',
+        'unavailable': 'هذا الكتاب غير متاح حالياً'
       };
-      alert(statusMessages[book.availability] || 'This book is not available');
+      alert(statusMessages[book.availability] || 'هذا الكتاب غير متاح');
       return;
     }
     
@@ -764,12 +764,12 @@ export default function App() {
 
     // If we track a total cap, respect it; otherwise rely on remaining stock
     if (maxAllowed !== null && currentCartQuantity >= maxAllowed) {
-      alert(`Sorry, you have reached the maximum available copies (${maxAllowed}) for "${book.title}"`);
+      alert(`عذراً، لقد وصلت إلى الحد الأقصى من النسخ المتاحة (${maxAllowed}) لـ "${book.title}"`);
       return;
     }
 
     if (remaining <= 0) {
-      alert(`Sorry, no more copies available for "${book.title}"`);
+      alert(`عذراً، لا توجد نسخ متاحة لـ "${book.title}"`);
       return;
     }
     
@@ -850,7 +850,7 @@ export default function App() {
     if (!book) return;
     const available = book.quantity || 0;
     if (available <= 0) {
-      alert('No more stock available for this title');
+      alert('لا توجد مخزون متاح لهذا العنوان');
       return;
     }
     // increment in cart
@@ -956,7 +956,7 @@ export default function App() {
                         onClick={openAdmin}
                         className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
                       >
-                        {isAdminOpen ? 'Close Admin' : 'Open Admin'}
+                        {isAdminOpen ? 'إغلاق لوحة التحكم' : 'فتح لوحة التحكم'}
                       </button>
                       {isAdminAuthed && (
                         <button
@@ -964,7 +964,7 @@ export default function App() {
                           onClick={handleAdminLogout}
                           className="inline-flex items-center gap-2 rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400"
                         >
-                          Logout
+                          تسجيل الخروج
                         </button>
                       )}
                     </div>
@@ -977,14 +977,14 @@ export default function App() {
                   {/* Admin login prompt for admin route */}
                   {!isAdminAuthed && (
                     <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
-                      <h3 className="text-lg font-semibold text-amber-800">Admin Access Required</h3>
-                      <p className="text-sm text-amber-700">Please log in to access the admin panel.</p>
+                      <h3 className="text-lg font-semibold text-amber-800">يتطلب الوصول كمسؤول</h3>
+                      <p className="text-sm text-amber-700">يرجى تسجيل الدخول للوصول إلى لوحة التحكم.</p>
                       <button
                         type="button"
                         onClick={() => setIsAuthModalOpen(true)}
                         className="mt-2 rounded-md bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
                       >
-                        Login
+                        تسجيل الدخول
                       </button>
                     </div>
                   )}
@@ -1009,21 +1009,21 @@ export default function App() {
                       for Books
                     </h2>
                     <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600">
-                      Discover a world of knowledge with our curated collection of new and used books. 
-                      From classics to contemporary works, find your next great read.
+                      اكتشف عالماً من المعرفة مع مجموعتنا المختارة من الكتب الجديدة والمستعملة. 
+                      من الكلاسيكيات إلى الأعمال المعاصرة، ابحث عن قراءتك القادمة.
                     </p>
                     <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
                       <button
                         onClick={() => handleNavigate('books')}
                         className="rounded-lg bg-amber-700 px-8 py-3 text-lg font-semibold text-white shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
                       >
-                        Browse All Books
+                        تصفح جميع الكتب
                       </button>
                       <button
                         onClick={() => handleNavigate('contact')}
                         className="rounded-lg border-2 border-amber-700 px-8 py-3 text-lg font-semibold text-amber-700 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
                       >
-                        Contact Us
+                        اتصل بنا
                       </button>
                     </div>
                   </div>
@@ -1034,8 +1034,8 @@ export default function App() {
               <section className="py-16 bg-white">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                   <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold text-slate-900">Featured Books</h2>
-                    <p className="mt-4 text-lg text-slate-600">Handpicked selections from our collection</p>
+                    <h2 className="text-3xl font-bold text-slate-900">كتب مميزة</h2>
+                    <p className="mt-4 text-lg text-slate-600">اختيارات مختارة بعناية من مجموعتنا</p>
                   </div>
                   
                   {isBooksReady ? (
@@ -1050,7 +1050,7 @@ export default function App() {
                       ))}
                     </div>
                   ) : (
-                    <div className="py-10 text-center text-sm text-slate-500">Loading…</div>
+                    <div className="py-10 text-center text-sm text-slate-500">جاري التحميل…</div>
                   )}
                   
                   <div className="mt-12 text-center">
@@ -1058,7 +1058,7 @@ export default function App() {
                       onClick={() => handleNavigate('books')}
                       className="rounded-lg bg-amber-700 px-8 py-3 text-lg font-semibold text-white shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
                     >
-                      View Complete Collection
+                      عرض المجموعة الكاملة
                     </button>
                   </div>
                 </div>
@@ -1070,15 +1070,15 @@ export default function App() {
                   <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
                     <div className="text-center">
                       <div className="text-4xl font-bold text-amber-700">{books.length}+</div>
-                      <div className="mt-2 text-lg text-slate-600">Books Available</div>
+                      <div className="mt-2 text-lg text-slate-600">كتاب متاح</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-4xl font-bold text-amber-700">New & Used</div>
-                      <div className="mt-2 text-lg text-slate-600">Book Conditions</div>
+                      <div className="text-4xl font-bold text-amber-700">جديد ومستعمل</div>
+                      <div className="mt-2 text-lg text-slate-600">حالات الكتب</div>
                     </div>
                     <div className="text-center">
                       <div className="text-4xl font-bold text-amber-700">24/7</div>
-                      <div className="mt-2 text-lg text-slate-600">WhatsApp Support</div>
+                      <div className="mt-2 text-lg text-slate-600">دعم واتساب</div>
                     </div>
                   </div>
                 </div>
@@ -1091,12 +1091,12 @@ export default function App() {
             <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
               <div className="mb-6">
                 <h2 className="text-2xl font-bold text-slate-900">
-                  {searchQuery ? `Search Results for "${searchQuery}"` : 'All Books'}
+                  {searchQuery ? `نتائج البحث عن "${searchQuery}"` : 'جميع الكتب'}
                 </h2>
                 <p className="text-slate-600">
                   {searchQuery 
-                    ? `${filteredBooks.length} book${filteredBooks.length !== 1 ? 's' : ''} found`
-                    : 'Browse our complete collection'
+                    ? `تم العثور على ${filteredBooks.length} ${filteredBooks.length === 1 ? 'كتاب' : 'كتاب'}`
+                    : 'تصفح مجموعتنا الكاملة'
                   }
                 </p>
               </div>
@@ -1124,11 +1124,11 @@ export default function App() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                           </div>
-                          <h3 className="text-lg font-semibold text-slate-900 mb-2">No books found</h3>
+                          <h3 className="text-lg font-semibold text-slate-900 mb-2">لم يتم العثور على كتب</h3>
                           <p className="text-slate-600 mb-4">
                             {searchQuery 
-                              ? `No books match "${searchQuery}". Try a different search term.`
-                              : 'No books available at the moment.'
+                              ? `لا توجد كتب تطابق "${searchQuery}". جرب مصطلح بحث آخر.`
+                              : 'لا توجد كتب متاحة في الوقت الحالي.'
                             }
                           </p>
                           {searchQuery && (
@@ -1136,14 +1136,14 @@ export default function App() {
                               onClick={() => handleSearch('')}
                               className="rounded-lg bg-amber-700 px-4 py-2 text-white font-medium hover:bg-amber-600"
                             >
-                              Clear Search
+                              مسح البحث
                             </button>
                           )}
                         </div>
                       )}
                     </>
                   ) : (
-                    <div className="py-10 text-center text-sm text-slate-500">Loading…</div>
+                    <div className="py-10 text-center text-sm text-slate-500">جاري التحميل…</div>
                   )}
                 </section>
 
@@ -1181,7 +1181,7 @@ export default function App() {
 
       <footer className="border-t border-amber-900/10 bg-white/60 backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 py-6 text-center text-xs text-slate-600 sm:px-6 lg:px-8">
-          © {new Date().getFullYear()} Diwan Mansour for Books. All rights reserved.
+          © {new Date().getFullYear()} ديوان منصور للكتب. جميع الحقوق محفوظة.
         </div>
       </footer>
 
@@ -1257,11 +1257,11 @@ function AdminPanel({ books, setBooks }) {
     
     if (!title || !author || !Number.isFinite(priceNum) || priceNum <= 0) return;
     if (!Number.isFinite(quantity) || quantity <= 0) {
-      alert('Please enter a valid quantity (must be greater than 0)');
+      alert('يرجى إدخال كمية صحيحة (يجب أن تكون أكبر من 0)');
       return;
     }
     if (!coverImageFile && !editingBook) {
-      alert('Please select a cover image');
+      alert('يرجى اختيار صورة الغلاف');
       return;
     }
     
@@ -1270,7 +1270,7 @@ function AdminPanel({ books, setBooks }) {
       const user = window.firebaseAuth.currentUser;
       console.log('Current user:', user);
       if (!user) {
-        alert('You must be logged in to edit books');
+        alert('يجب تسجيل الدخول لتعديل الكتب');
         return;
       }
     }
@@ -1294,11 +1294,11 @@ function AdminPanel({ books, setBooks }) {
         if (result.success) {
           imageUrl = result.data.url;
         } else {
-          throw new Error(result.error?.message || 'Upload failed');
+          throw new Error(result.error?.message || 'فشل الرفع');
         }
       } catch (err) {
         console.error('ImgBB upload failed', err);
-        alert('Failed to upload image. Please try again.');
+        alert('فشل رفع الصورة. يرجى المحاولة مرة أخرى.');
         return;
       }
     }
@@ -1346,7 +1346,7 @@ function AdminPanel({ books, setBooks }) {
       }
     } catch (err) {
       console.error('Add/Update book failed', err);
-      alert('Failed to save book: ' + err.message);
+      alert('فشل حفظ الكتاب: ' + err.message);
     }
     
     setForm({ title: '', author: '', price: '', condition: 'new', quantity: 1, availability: 'available', originalQuantity: 1 });
@@ -1368,35 +1368,35 @@ function AdminPanel({ books, setBooks }) {
   return (
     <section className="mb-6 rounded-xl border border-amber-900/10 bg-white p-4 shadow-sm">
       <h3 className="mb-3 text-base font-semibold text-slate-900">
-        {editingBook ? `Edit Book: ${editingBook.title}` : 'Admin Panel'}
+        {editingBook ? `تعديل الكتاب: ${editingBook.title}` : 'لوحة التحكم'}
       </h3>
       
       {/* Debug info */}
       <div className="mb-3 rounded-md bg-slate-100 p-2 text-xs">
-        <p>Firebase DB: {window.firebaseDb ? '✅ Connected' : '❌ Not connected'}</p>
-        <p>Firebase Auth: {window.firebaseAuth ? '✅ Available' : '❌ Not available'}</p>
-        <p>Current User: {window.firebaseAuth?.currentUser ? window.firebaseAuth.currentUser.email : 'Not logged in'}</p>
+        <p>قاعدة بيانات Firebase: {window.firebaseDb ? '✅ متصل' : '❌ غير متصل'}</p>
+        <p>مصادقة Firebase: {window.firebaseAuth ? '✅ متاح' : '❌ غير متاح'}</p>
+        <p>المستخدم الحالي: {window.firebaseAuth?.currentUser ? window.firebaseAuth.currentUser.email : 'غير مسجل دخول'}</p>
       </div>
       <form onSubmit={handleAdd} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <input
           name="title"
           value={form.title}
           onChange={handleChange}
-          placeholder="Title"
+          placeholder="عنوان الكتاب"
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
         />
         <input
           name="author"
           value={form.author}
           onChange={handleChange}
-          placeholder="Author"
+          placeholder="المؤلف"
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
         />
         <input
           name="price"
           value={form.price}
           onChange={handleChange}
-          placeholder="Price (EGP)"
+          placeholder="السعر (جنيه)"
           type="number"
           min="1"
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
@@ -1407,14 +1407,14 @@ function AdminPanel({ books, setBooks }) {
           onChange={handleChange}
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
         >
-          <option value="new">جديد (New)</option>
-          <option value="used">مستعمل (Used)</option>
+          <option value="new">جديد</option>
+          <option value="used">مستعمل</option>
         </select>
         <input
           name="quantity"
           value={form.quantity}
           onChange={handleChange}
-          placeholder="Quantity"
+          placeholder="الكمية"
           type="number"
           min="1"
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
@@ -1425,8 +1425,8 @@ function AdminPanel({ books, setBooks }) {
           onChange={handleChange}
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
         >
-          <option value="available">متوفر (Available)</option>
-          <option value="unavailable">غير متوفر (Unavailable)</option>
+          <option value="available">متوفر</option>
+          <option value="unavailable">غير متوفر</option>
         </select>
         <div className="flex flex-col gap-2">
           <input
@@ -1440,7 +1440,7 @@ function AdminPanel({ books, setBooks }) {
               type="submit"
               className="flex-1 rounded-md bg-amber-700 px-3 py-2 text-sm font-medium text-white shadow hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400"
             >
-              {editingBook ? 'Update Book' : 'Add Book'}
+              {editingBook ? 'تحديث الكتاب' : 'إضافة كتاب'}
             </button>
             {editingBook && (
               <button
@@ -1448,7 +1448,7 @@ function AdminPanel({ books, setBooks }) {
                 onClick={cancelEdit}
                 className="rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-400"
               >
-                Cancel
+                إلغاء
               </button>
             )}
           </div>
@@ -1471,14 +1471,14 @@ function AdminPanel({ books, setBooks }) {
                 onClick={() => startEdit(b)}
                 className="rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-200"
               >
-                Edit
+                تعديل
               </button>
               <button
                 type="button"
                 onClick={() => handleRemove(b.id)}
                 className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200"
               >
-                Remove
+                حذف
               </button>
             </div>
           </div>
@@ -1519,20 +1519,20 @@ function AdminAuthModal({ isOpen, onClose, onSuccess }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-sm rounded-xl border border-amber-900/10 bg-white p-5 shadow-xl">
-        <h3 className="mb-3 text-base font-semibold text-slate-900">Admin Login</h3>
+        <h3 className="mb-3 text-base font-semibold text-slate-900">تسجيل دخول المسؤول</h3>
         <form onSubmit={submit} className="space-y-3">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Admin email"
+            placeholder="البريد الإلكتروني"
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
           />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
+            placeholder="كلمة المرور"
             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
           />
           {error ? (
@@ -1545,18 +1545,18 @@ function AdminAuthModal({ isOpen, onClose, onSuccess }) {
               className="rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
               disabled={loading}
             >
-              Cancel
+              إلغاء
             </button>
             <button
               type="submit"
               disabled={loading}
               className="rounded-md bg-amber-700 px-3 py-2 text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-60"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
             </button>
           </div>
         </form>
-        <p className="mt-3 text-xs text-slate-500">Use a Firebase Auth email/password user. Configure in Firebase Console.</p>
+        <p className="mt-3 text-xs text-slate-500">استخدم مستخدم Firebase Auth بالبريد الإلكتروني/كلمة المرور. قم بالتكوين في Firebase Console.</p>
       </div>
     </div>
   );
