@@ -299,9 +299,9 @@ function Header({ onToggleCart, cartItemsCount }) {
           <img src="./logo.png" alt="Diwan Mansour logo" className="h-10 w-10 rounded-md ring-1 ring-amber-600/40 object-contain bg-white" />
           <div>
             <h1 className="text-lg font-semibold tracking-tight sm:text-xl">
-              Diwan Mansour for Books
+              Diwan Mansour
             </h1>
-            <p className="text-xs text-amber-100/90 sm:text-sm">مكتبة إلكترونية لعرض وبيع الكتب</p>
+            <p className="text-xs text-amber-100/90 sm:text-sm">مكتبة إلكترونية لبيع الكتب</p>
           </div>
         </div>
         
