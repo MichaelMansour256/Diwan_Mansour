@@ -285,15 +285,6 @@ function ContactSection() {
             </a>
           </div>
         </div>
-        
-        <div className="mt-12 text-center">
-          <div className="rounded-xl bg-gradient-to-r from-amber-100 to-orange-100 p-8">
-            <h3 className="text-xl font-semibold text-amber-800 mb-4">🕒 ساعات العمل</h3>
-            <p className="text-slate-700">السبت - الخميس: 9:00 صباحاً - 6:00 مساءً</p>
-            <p className="text-slate-700">الجمعة: 10:00 صباحاً - 4:00 مساءً</p>
-            <p className="text-slate-600 mt-2">متاح على واتساب 24/7</p>
-          </div>
-        </div>
       </div>
     </section>
   );
