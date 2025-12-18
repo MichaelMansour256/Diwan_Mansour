@@ -277,7 +277,7 @@ function ContactSection() {
             <h3 className="text-xl font-semibold text-slate-800 mb-4">📧 البريد الإلكتروني</h3>
             <p className="text-slate-700 mb-4">أرسل لنا بريدًا إلكترونيًا للاستفسار عن توفر الكتب والطلبات.</p>
             <a 
-              href="mailto:info@diwanmansour.com" 
+              href="diwan-mansour@proton.me" 
               className="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-6 py-3 text-white font-medium hover:bg-slate-800 transition-colors"
             >
               <span>✉️</span>
