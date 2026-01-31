@@ -74,7 +74,7 @@
     </script>
 
     <!-- App: load the JSX file content inline for demo use -->
-    <script type="text/babel" data-type="module" data-presets="env,react">
+    <script type="text/babel" data-type="module" data-presets="react">
       async function loadApp() {
         const notice = document.getElementById('notice');
         function showInfo(html) { notice.innerHTML = '<div class="infoBox">' + html + '</div>'; }
@@ -100,7 +100,8 @@
           const shim = 'const { useEffect, useMemo, useState } = React;\n';
           let transformed;
           try {
-            transformed = Babel.transform(shim + stripped + expose, { presets: ['env', 'react'] }).code;
+            // Use only react preset to avoid env preset configuration issues
+            transformed = Babel.transform(shim + stripped + expose, { presets: ['react'] }).code;
           } catch (transformErr) {
             showError('Babel transform error.\n' + transformErr.message + '\n\nTip: Ensure the file starts with an import of React and uses `export default function App()`');
             console.error(transformErr);
