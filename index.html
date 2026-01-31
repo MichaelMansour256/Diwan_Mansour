@@ -41,7 +41,7 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <!-- Babel for in-browser JSX transform (dev only) -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
 
     <!-- Firebase (compat builds for simplicity in this demo) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -74,12 +74,41 @@
     </script>
 
     <!-- App: load the JSX file content inline for demo use -->
-    <script type="text/babel" data-type="module" data-presets="react">
-      async function loadApp() {
+    <script>
+      // Wait for Babel to be available
+      function waitForBabel() {
+        return new Promise((resolve) => {
+          if (typeof Babel !== 'undefined') {
+            resolve();
+          } else {
+            const checkInterval = setInterval(() => {
+              if (typeof Babel !== 'undefined') {
+                clearInterval(checkInterval);
+                resolve();
+              }
+            }, 50);
+            // Timeout after 5 seconds
+            setTimeout(() => {
+              clearInterval(checkInterval);
+              resolve();
+            }, 5000);
+          }
+        });
+      }
+
+      (async function loadApp() {
         const notice = document.getElementById('notice');
         function showInfo(html) { notice.innerHTML = '<div class="infoBox">' + html + '</div>'; }
         function showError(html) { notice.innerHTML = '<div class="errorBox">' + html + '</div>'; }
         try {
+          // Wait for Babel to load
+          await waitForBabel();
+          
+          if (typeof Babel === 'undefined') {
+            showError('Babel library failed to load. Please check your internet connection.');
+            return;
+          }
+
           if (location.protocol === 'file:') {
             showInfo('For security reasons, some browsers block loading local files. Please run a local server:<br/><code>python -m http.server 5173</code> or <code>npx serve -s . --listen 5173</code> and open <code>http://localhost:5173/index.html</code>.');
           }
@@ -101,10 +130,13 @@
           let transformed;
           try {
             // Use only react preset to avoid env preset configuration issues
-            transformed = Babel.transform(shim + stripped + expose, { presets: ['react'] }).code;
+            transformed = Babel.transform(shim + stripped + expose, { 
+              presets: ['react'],
+              compact: false
+            }).code;
           } catch (transformErr) {
             showError('Babel transform error.\n' + transformErr.message + '\n\nTip: Ensure the file starts with an import of React and uses `export default function App()`');
-            console.error(transformErr);
+            console.error('Babel error:', transformErr);
             return;
           }
 
@@ -113,7 +145,7 @@
             eval(transformed);
           } catch (evalErr) {
             showError('Runtime eval error.\n' + (evalErr.stack || evalErr.message));
-            console.error(evalErr);
+            console.error('Eval error:', evalErr);
             return;
           }
 
@@ -125,11 +157,10 @@
           const root = ReactDOM.createRoot(document.getElementById('root'));
           root.render(React.createElement(window.App));
         } catch (err) {
-          console.error(err);
+          console.error('Load error:', err);
           showError('Failed to load demo.\n' + (err.stack || err.message));
         }
-      }
-      loadApp();
+      })();
     </script>
   </body>
 </html>
